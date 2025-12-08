@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>bdext.sql</file>
+    </qresource>
+</RCC>
