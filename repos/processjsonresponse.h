@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include <QObject>
 #include <QString>
 #include <QVariantList>
@@ -63,3 +63,4 @@ private:
     void updateDailyStats(int userId, const QString& dayISO, double waterMl,
                           ConsumedRepository& consumedRepo, DailyStatisticsRepository& statsRepo);
 };
+*/

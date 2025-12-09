@@ -80,5 +80,5 @@ private:
     UsersRepository m_users;
     RecipesRepository m_recipes;
     RecipeIngredientsRepository m_recipeIngredients;
-     ProcessJsonResponse m_jsonProc;
+    //ProcessJsonResponse m_jsonProc;
 };

@@ -13,12 +13,12 @@ ApplicationWindow {
     property int testUserId: 1
 
     // Лог + пагинация
-    property var logLines: []
+    property var logLines: []        // каждая строка — отдельный элемент массива
     property int pageSize: 50
     property int currentPage: 0
-    property int logVersion: 0  // инкремент при каждом добавлении/очистке
+    property int logVersion: 0       // триггер перерисовки
 
-    // Видимый текст страницы (реактивно зависит от версии, страницы и размера)
+    // Видимый текст текущей страницы
     property string visibleText: getVisibleText()
 
     function getVisibleText() {
@@ -27,20 +27,26 @@ ApplicationWindow {
         return logLines.slice(start, end).join("\n")
     }
 
-    function appendLog(line) {
+    // Добавить одну строку
+    function appendLine(line) {
         logLines.push(line)
-        logVersion++            // триггерим пересчёт
-        visibleText = getVisibleText()
+        logVersion++
     }
 
-    function redrawPage() {
-        visibleText = getVisibleText()
+    // Добавить многострочный блок как отдельные строки
+    function appendBlock(text) {
+        const lines = String(text).split(/\r?\n/)
+        for (var i = 0; i < lines.length; ++i) {
+            appendLine(lines[i])
+        }
+        // Автопереход на последнюю страницу при новых записях (можно отключить)
+        currentPage = Math.max(0, Math.ceil(logLines.length / pageSize) - 1)
     }
 
-    // Пересчёт при изменении параметров пагинации
-    onCurrentPageChanged: redrawPage()
-    onPageSizeChanged: redrawPage()
-    onLogVersionChanged: redrawPage()
+    // Перерисовка при изменениях
+    onCurrentPageChanged: visibleText = getVisibleText()
+    onPageSizeChanged:    visibleText = getVisibleText()
+    onLogVersionChanged:  visibleText = getVisibleText()
 
     ColumnLayout {
         anchors.fill: parent
@@ -65,7 +71,7 @@ ApplicationWindow {
                     text: "Инициализировать"
                     onClicked: {
                         const ok = nutritionConverter.initDatabase(dbPathField.text, ":/bdext.sql")
-                        appendLog(ok ? "[INIT] База подключена" : "[INIT] Ошибка подключения")
+                        appendLine(ok ? "[INIT] База подключена" : "[INIT] Ошибка подключения")
                     }
                 }
 
@@ -97,7 +103,7 @@ ApplicationWindow {
                 enabled: nutritionConverter.isConnected
                 onClicked: {
                     if (jsonInput.text.length === 0) {
-                        appendLog("[PROCESS] Пустой JSON")
+                        appendLine("[PROCESS] Пустой JSON")
                         return
                     }
                     nutritionConverter.processJsonResponse(jsonInput.text, testUserId)
@@ -108,9 +114,10 @@ ApplicationWindow {
                 text: "Показать сегодняшнюю статистику"
                 enabled: nutritionConverter.isConnected
                 onClicked: {
-                    const stats = nutritionConverter.getDailyStatistics(testUserId, "")
-                    appendLog("=== DAILY STATS ===")
-                    appendLog(JSON.stringify(stats, null, 4))
+                    const stats = nutritionConverter.getConsumedToday(testUserId, "")
+                    appendLine("=== DAILY STATS ===")
+                    console.log(stats);
+                    appendBlock(JSON.stringify(stats, null, 4))
                 }
             }
 
@@ -119,8 +126,8 @@ ApplicationWindow {
                 enabled: nutritionConverter.isConnected
                 onClicked: {
                     const p = nutritionConverter.getAllProducts()
-                    appendLog("=== PRODUCTS LIST ===")
-                    appendLog(JSON.stringify(p, null, 4))
+                    appendLine("=== PRODUCTS LIST ===")
+                    appendBlock(JSON.stringify(p, null, 4))
                 }
             }
 
@@ -129,8 +136,8 @@ ApplicationWindow {
                 enabled: nutritionConverter.isConnected
                 onClicked: {
                     const e = nutritionConverter.getAllEmotions()
-                    appendLog("=== EMOTIONS LIST ===")
-                    appendLog(JSON.stringify(e, null, 4))
+                    appendLine("=== EMOTIONS LIST ===")
+                    appendBlock(JSON.stringify(e, null, 4))
                 }
             }
 
@@ -139,8 +146,8 @@ ApplicationWindow {
                 enabled: nutritionConverter.isConnected
                 onClicked: {
                     const ex = nutritionConverter.getExerciseEntriesByUser(testUserId, "")
-                    appendLog("=== EXERCISES LIST ===")
-                    appendLog(JSON.stringify(ex, null, 4))
+                    appendLine("=== EXERCISES LIST ===")
+                    appendBlock(JSON.stringify(ex, null, 4))
                 }
             }
 
@@ -149,8 +156,18 @@ ApplicationWindow {
                 enabled: nutritionConverter.isConnected
                 onClicked: {
                     const u = nutritionConverter.getAllUsers()
-                    appendLog("=== USERS LIST ===")
-                    appendLog(JSON.stringify(u, null, 4))
+                    appendLine("=== USERS LIST ===")
+                    appendBlock(JSON.stringify(u, null, 4))
+                }
+            }
+
+            Button {
+                text: "Очистить лог"
+                enabled: true
+                onClicked: {
+                    logLines = []
+                    logVersion++
+                    currentPage = 0
                 }
             }
         }
@@ -170,7 +187,7 @@ ApplicationWindow {
                     Layout.fillHeight: true
                     readOnly: true
                     wrapMode: TextArea.Wrap
-                    text: visibleText  // ключевая привязка
+                    text: visibleText
                 }
 
                 RowLayout {
@@ -200,7 +217,7 @@ ApplicationWindow {
 
     Connections {
         target: nutritionConverter
-        function onDataProcessed(success, message) { appendLog("[RESULT] " + message) }
-        function onErrorOccurred(msg) { appendLog("[ERROR] " + msg) }
+        function onDataProcessed(success, message) { appendLine("[RESULT] " + message) }
+        function onErrorOccurred(msg) { appendLine("[ERROR] " + msg) }
     }
 }

@@ -56,7 +56,12 @@ bool NutritionConverter::consumed(int userId,
                                   const QString &unit,
                                   bool isRecipe)
 {
-    if (isConnected() || itemName.isEmpty() || quantity <= 0) {
+    //qDebug()<<not(isConnected() ||  || quantity <= 0);
+    if(not isConnected()){
+        emit errorOccurred("not connected");
+        return false;
+    }
+    if (itemName.isEmpty() || quantity <= 0) {
         emit errorOccurred("Invalid consumed entry");
         return false;
     }
@@ -91,10 +96,10 @@ bool NutritionConverter::consumed(int userId,
     // Если базовое количество 0 или некорректное, нутриенты считаем от 100 г/мл (как в processConsumed), или защищаемся
     const double divisor = (baseQty > 0.0 ? baseQty : 100.0);
     const double factor = quantity / divisor;
-    const double proteins = baseProteins * factor;
-    const double fats     = baseFats     * factor;
-    const double carbs    = baseCarbs    * factor;
-    const double calories = 0;//calculateCalories(proteins, fats, carbs);
+    const double proteins = baseProteins * 4;
+    const double fats     = baseFats     * 9;
+    const double carbs    = baseCarbs    * 4;
+    const double calories = (proteins+fats+carbs)*factor;//calculateCalories(proteins, fats, carbs);
 
     // Всегда пишем запись о потреблении
     const QString ts = QDateTime::currentDateTime().toString(Qt::ISODate);
@@ -117,6 +122,7 @@ bool NutritionConverter::consumed(int userId,
     }
 
     // Если newQty >= 0: НЕ обновляем products/recipes, но обновляем статистику
+
     {
         QVariantMap stats = m_stats.getDailyStatisticsRecord(userId, date);
         const double totalProteins = stats.value("proteins").toDouble() + proteins;
@@ -176,9 +182,10 @@ bool NutritionConverter::processJsonResponse(const QString &json, int userId)
     for (auto e : emotions) {
 
         QJsonObject eo = e.toObject();
+             qDebug()<<eo;
        // m_emotions.g
         if (eo.isEmpty()) {
-            qWarning() << " co Skipping empty consumed entry";
+            qWarning() << " co Skipping empty eo entry";
             continue; // просто игнорируем
         }
         m_emotions.createOrUpdateEmotion(eo["name"].toString(), eo["classification"].toString());
@@ -190,11 +197,14 @@ bool NutritionConverter::processJsonResponse(const QString &json, int userId)
     QString ts = QDateTime::currentDateTime().toString(Qt::ISODate);
     for (auto c : consumed) {
         QJsonObject co = c.toObject();
+        qDebug()<<co;
         if (c.toObject().isEmpty()) {
             qWarning() << " co Skipping empty consumed entry";
             continue; // просто игнорируем
         }
-        m_consumed.createOrUpdateConsumedEntry(userId, today,
+
+        this->consumed(userId,today,co["name"].toString(),co["quantity"].toDouble(),"г",false);
+       /* m_consumed.createOrUpdateConsumedEntry(userId, today,
                                        co["name"].toString(),
                                        co["quantity"].toDouble(),
                                        co["unit"].toString(),
@@ -202,15 +212,16 @@ bool NutritionConverter::processJsonResponse(const QString &json, int userId)
                                        co["fats"].toDouble(),
                                        co["carbs"].toDouble(),
                                        co["calories"].toDouble(),
-                                       ts);
+                                       ts);*/
     }
 
     // Exercises
     QJsonArray exercises = obj["exercises"].toArray();
     for (auto ex : exercises) {
         QJsonObject eo = ex.toObject();
+        qDebug()<<eo;
         if (ex.toObject().isEmpty()) {
-            qWarning() << "eo Skipping empty consumed entry";
+            qWarning() << "eo Skipping empty exercises entry";
             continue; // просто игнорируем
         }
         m_exercises.createExerciseEntry(userId, today,

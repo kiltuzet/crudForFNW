@@ -15,6 +15,7 @@ public:
                             double fats, double carbs, double calories, const QString &timestamp);
     QVariantMap getConsumedEntry(int id);
     QVariantList getConsumedEntriesByUser(int userId, const QString &date);
+    QVariantMap getConsumedEntry(int id, const QString &date);
     bool updateConsumedEntry(int id, const QString &productName, double quantity,
                              const QString &unit, double proteins, double fats,
                              double carbs, double calories);

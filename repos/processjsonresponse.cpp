@@ -1,4 +1,4 @@
-#include "processjsonresponse.h"
+/*#include "processjsonresponse.h"
 #include <QDebug>
 
 ProcessJsonResponse::ProcessJsonResponse(QObject* parent) : QObject(parent) {}
@@ -228,3 +228,4 @@ void ProcessJsonResponse::updateDailyStats(int userId, const QString& dayISO, do
     statsRepo.createOrUpdateDailyStatistics(userId, dayISO, waterMl,
                                             totalProteins, totalFats, totalCarbs, totalCalories);
 }
+*/

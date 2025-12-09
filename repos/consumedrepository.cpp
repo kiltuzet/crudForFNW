@@ -54,6 +54,33 @@ QVariantMap ConsumedRepository::getConsumedEntry(int id)
     return r;
 }
 
+QVariantMap ConsumedRepository::getConsumedEntry(int userId, const QString &date)
+{
+    QVariantMap r;
+    if (!m_db.isValid() || !m_db.isOpen()) return r;
+    QSqlQuery q(m_db);
+    q.prepare("SELECT id, user_id, date, product_name, quantity, unit, proteins, fats, carbs, calories, timestamp FROM consumed_entries WHERE id = :id");
+    q.bindValue(":uid", userId);
+    q.bindValue(":dt", date);
+    if (q.exec()) {
+        while (q.next()) {
+            QVariantMap item;
+            item["id"] = q.value(0);
+            item["user_id"] = q.value(1);
+            item["date"] = q.value(2);
+            item["product_name"] = q.value(3);
+            item["quantity"] = q.value(4);
+            item["unit"] = q.value(5);
+            item["proteins"] = q.value(6);
+            item["fats"] = q.value(7);
+            item["carbs"] = q.value(8);
+            item["calories"] = q.value(9);
+            item["timestamp"] = q.value(10);
+        }
+    }
+    return r;
+}
+
 QVariantList ConsumedRepository::getConsumedEntriesByUser(int userId, const QString &date)
 {
     QVariantList out;
@@ -82,6 +109,7 @@ QVariantList ConsumedRepository::getConsumedEntriesByUser(int userId, const QStr
     }
     return out;
 }
+
 
 int ConsumedRepository::getIdByName(const QString &productName)
 {
