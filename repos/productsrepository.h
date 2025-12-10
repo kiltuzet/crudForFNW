@@ -1,30 +1,17 @@
 #pragma once
-#include <QObject>
-#include <QVariantList>
-#include <QSqlDatabase>
+#include "BaseRepository.h"
 
-class ProductsRepository : public QObject
-{
+class ProductsRepository : public BaseRepository {
     Q_OBJECT
 public:
-    explicit ProductsRepository(QObject *parent = nullptr);
-    void setDatabase(const QSqlDatabase &db);
+    explicit ProductsRepository(QObject *parent=nullptr);
 
     int createProduct(const QString &name, double quantity, const QString &unit,
                       double proteins, double fats, double carbs);
     QVariantMap getProduct(int id);
-    QVariantMap getProductByName(const QString &name);
     QVariantList getAllProducts();
-    bool updateProduct(int id, const QString &name, double quantity, const QString &unit,
-                       double proteins, double fats, double carbs);
+    bool updateProduct(int id, const QString &name, double quantity);
     bool deleteProduct(int id);
-    bool createOrUpdateProduct(const QString &name,
-                               double quantity,
-                               const QString &unit,
-                               double proteins,
-                               double fats,
-                               double carbs);
-    int getIdByName(const QString &name);
-private:
-    QSqlDatabase m_db;
+    bool createOrUpdateProduct(int id, const QString &name, double quantity, const QString &unit,
+                               double proteins, double fats, double carbs);
 };
