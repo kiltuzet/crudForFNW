@@ -37,4 +37,14 @@ public:
 
     // UPSERT
     bool createOrUpdate(int id, const QVariantMap &values);
+    // вставка по ключам
+    bool insertWithKeys(const QString &tableName,
+                        const QVariantMap &values);
+    //int BaseRepository::getIdByName(const QString &tableName, const QString &name)
+    // метод для получения данных по имени
+    int getIdByField(const QString &tableName,
+                    const QString &name);
+    //для получения
+    QVariantMap getByField(const QString &fieldName, const QVariant &value);
+
 };

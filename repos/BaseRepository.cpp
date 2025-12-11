@@ -74,12 +74,75 @@ bool BaseRepository::update(int id, const QVariantMap &values) {
     return q.exec();
 }
 
+bool BaseRepository::insertWithKeys(const QString &tableName,
+                                    const QVariantMap &values) {
+    QStringList columns = values.keys();
+    QStringList placeholders;
+    for (const auto &col : std::as_const(columns)) {
+        placeholders << ":" + col;
+    }
+
+    QString sql = QString("INSERT INTO %1 (%2) VALUES (%3)")
+                      .arg(tableName, columns.join(", "), placeholders.join(", "));
+
+    QSqlQuery query(m_db);
+    query.prepare(sql);
+    for (const auto &col : std::as_const(columns)) {
+        query.bindValue(":" + col, values.value(col));
+    }
+    return query.exec();
+}
+
+int BaseRepository::getIdByField(const QString &tableName,
+                                const QString &name) {
+    QSqlQuery query(m_db);
+    query.prepare(QString("SELECT id FROM %1 WHERE name = :name LIMIT 1")
+                      .arg(tableName));
+    query.bindValue(":name", name);
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt();
+    }
+    return -1;
+}
+
 bool BaseRepository::deleteById(int id) {
     if (!m_db.isValid() || !m_db.isOpen()) return false;
     QSqlQuery q(m_db);
     q.prepare(QString("DELETE FROM %1 WHERE id=:id").arg(m_table));
     q.bindValue(":id", id);
     return q.exec();
+}
+
+QVariantMap BaseRepository::getByField(const QString &fieldName, const QVariant &value)
+{
+    QVariantMap result;
+    if (!m_db.isValid() || !m_db.isOpen()) {
+        qWarning() << "[BaseRepository] Database is not open or invalid";
+        return result;
+    }
+
+    // Формируем SQL-запрос
+    QString sql = QString("SELECT %1 FROM %2 WHERE %3 = :val LIMIT 1")
+                      .arg(m_fields.join(", "))
+                      .arg(m_table)
+                      .arg(fieldName);
+
+    QSqlQuery query(m_db);
+    query.prepare(sql);
+    query.bindValue(":val", value);
+
+    if (!query.exec()) {
+        qWarning() << "[BaseRepository] getByField failed:" << query.lastError().text();
+        return result;
+    }
+
+    if (query.next()) {
+        for (int i = 0; i < m_fields.size(); ++i) {
+            result[m_fields[i]] = query.value(i);
+        }
+    }
+
+    return result;
 }
 
 bool BaseRepository::createOrUpdate(int id, const QVariantMap &values) {

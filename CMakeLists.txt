@@ -32,8 +32,14 @@ qt_add_qml_module(appuntitled1
         SOURCES repos/dailystatisticsrepository.h repos/dailystatisticsrepository.cpp
         RESOURCES resources.qrc
         SOURCES
-        SOURCES repos/processjsonresponse.h repos/processjsonresponse.cpp
+        SOURCES
         QML_FILES PaginatedListView.qml
+        SOURCES repos/BaseRepository.h
+        SOURCES
+        SOURCES repos/BaseRepository.cpp
+        SOURCES services/BaseService.h
+        SOURCES services/BaseService.cpp
+        #SOURCES service/BaseService.h
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
