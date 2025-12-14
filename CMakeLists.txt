@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS Core Sql)
+find_package(Qt6 REQUIRED COMPONENTS Core)
 
 
 qt_standard_project_setup(REQUIRES 6.8)
@@ -32,8 +33,22 @@ qt_add_qml_module(appuntitled1
         SOURCES repos/dailystatisticsrepository.h repos/dailystatisticsrepository.cpp
         RESOURCES resources.qrc
         SOURCES
-        SOURCES repos/processjsonresponse.h repos/processjsonresponse.cpp
+        SOURCES
         QML_FILES PaginatedListView.qml
+        SOURCES repos/BaseRepository.h
+        SOURCES
+        SOURCES repos/BaseRepository.cpp
+        SOURCES services/BaseService.h
+        SOURCES services/BaseService.cpp
+        SOURCES services/productservice.h services/productservice.cpp
+        SOURCES services/recipeservice.h services/recipeservice.cpp
+        SOURCES services/usersservice.h services/usersservice.cpp
+        SOURCES services/emotionsservice.h services/emotionsservice.cpp
+        SOURCES services/acheivmentsservice.h services/acheivmentsservice.cpp
+        SOURCES services/dailystatistics.h services/dailystatistics.cpp
+        SOURCES services/consumedservice.h services/consumedservice.cpp
+        SOURCES services/exerciseservice.h services/exerciseservice.cpp
+        #SOURCES service/BaseService.h
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -56,6 +71,7 @@ qt6_add_resources(appuntitled1 "application_resources"
     FILES
         bdext.sql
 )
+target_link_libraries(appuntitled1 PRIVATE Qt6::Core)
 target_link_libraries(appuntitled1 PRIVATE Qt6::Core)
 
 
