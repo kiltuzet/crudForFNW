@@ -1,11 +1,21 @@
 #pragma once
 #include "BaseRepository.h"
 
-class ProductsRepository : public BaseRepository {
+class RecipeIngredientsRepository : public BaseRepository {
     Q_OBJECT
 public:
-    explicit ProductsRepository(QObject *parent = nullptr);
+    explicit RecipeIngredientsRepository(QObject *parent = nullptr);
 
-    // Специфичные методы
-    QVariantMap getProductByName(const QString &name);
+    // Добавить продукт в рецепт
+    int addProductToRecipe(int recipeId, int productId);
+
+    // Получить все продукты для рецепта
+    QVariantList getProductsForRecipe(int recipeId);
+
+    // Удалить все продукты для рецепта
+    bool deleteAllForRecipe(int recipeId);
+
+    bool removeProductFromRecipe(int recipeId, int productId);
+
+    int addProductToRecipe(int recipeId, int productId);
 };

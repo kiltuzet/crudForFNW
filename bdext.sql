@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS recipes (
     carbs REAL NOT NULL
 );
 
--- 4. Таблица ингредиентов рецептов
+-- 4. Таблица ингредиентов рецептов убрать все поля связанные с БЖУ
 CREATE TABLE IF NOT EXISTS recipe_ingredients (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     recipe_id INTEGER NOT NULL,

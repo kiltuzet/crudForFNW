@@ -1,7 +1,7 @@
 #include "BaseService.h"
 #include <QDebug>
 
-BaseService::BaseService(QSqlDatabase db, QObject* parent)
+BaseService::BaseService(const QSqlDatabase& db, QObject* parent)
     : QObject(parent), m_db(db) {}
 
 bool BaseService::beginTransaction() {
@@ -26,4 +26,14 @@ void BaseService::logInfo(const QString& msg) {
 
 void BaseService::logError(const QString& msg) {
     qWarning() << "[Service ERROR]" << msg;
+}
+
+QVariantMap BaseService::makeResponse(bool success,
+                                      const QString& message,
+                                      const QVariantMap& payload) {
+    QVariantMap response;
+    response["success"] = success;
+    response["message"] = message;
+    response["data"]    = payload;
+    return response;
 }

@@ -1,20 +1,28 @@
 #pragma once
 #include <QObject>
 #include <QSqlDatabase>
+#include <QVariantMap>
 #include <QString>
 
 class BaseService : public QObject {
     Q_OBJECT
-public:
-    explicit BaseService(QSqlDatabase db, QObject* parent = nullptr);
-
 protected:
     QSqlDatabase m_db;
 
-    bool beginTransaction();
-    bool commitTransaction();
-    bool rollbackTransaction();
+public:
+    explicit BaseService(const QSqlDatabase& db, QObject* parent = nullptr);
 
-    void logInfo(const QString& msg);
-    void logError(const QString& msg);
+    // Транзакции
+    Q_INVOKABLE bool beginTransaction();
+    Q_INVOKABLE bool commitTransaction();
+    Q_INVOKABLE bool rollbackTransaction();
+
+    // Логирование
+    Q_INVOKABLE void logInfo(const QString& msg);
+    Q_INVOKABLE void logError(const QString& msg);
+
+    // Унифицированный ответ для QML
+    Q_INVOKABLE QVariantMap makeResponse(bool success,
+                                         const QString& message,
+                                         const QVariantMap& payload = {});
 };

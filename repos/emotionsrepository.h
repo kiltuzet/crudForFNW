@@ -1,23 +1,12 @@
 #pragma once
-#include <QObject>
-#include <QVariantList>
-#include <QSqlDatabase>
+#include "BaseRepository.h"
 
-class EmotionsRepository : public QObject
-{
+class EmotionsRepository : public BaseRepository {
     Q_OBJECT
 public:
     explicit EmotionsRepository(QObject *parent = nullptr);
-    void setDatabase(const QSqlDatabase &db);
 
+    // Специфичные методы
     int createEmotion(const QString &name, const QString &classification);
-    QVariantMap getEmotion(int id);
-    QVariantList getAllEmotions();
-    bool updateEmotion(int id, const QString &name, const QString &classification);
-    bool deleteEmotion(int id);
-    bool createOrUpdateEmotion(const QString &name,
-                               const QString &classification);
-    int getIdByName(const QString &name);
-private:
-    QSqlDatabase m_db;
+    QVariantMap getEmotionByName(const QString &name);
 };
