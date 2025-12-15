@@ -19,7 +19,7 @@ qt_add_qml_module(appuntitled1
     URI untitled1
     QML_FILES
         Main.qml
-        SOURCES nutritionconverter.h nutritionconverter.cpp
+        SOURCES
         SOURCES
         SOURCES database/databaseconnection.cpp database/databaseconnection.h database/databaseinitializer.cpp database/databaseinitializer.h repos/productsrepository.cpp repos/productsrepository.h
         SOURCES repos/achievementsrepository.h repos/achievementsrepository.cpp
@@ -32,8 +32,8 @@ qt_add_qml_module(appuntitled1
         SOURCES repos/exerciseentriesrepository.h repos/exerciseentriesrepository.cpp
         SOURCES repos/dailystatisticsrepository.h repos/dailystatisticsrepository.cpp
         RESOURCES resources.qrc
-        SOURCES
-        SOURCES
+        SOURCES services/processjsonresponse.h
+        SOURCES services/processjsonresponse.cpp
         QML_FILES PaginatedListView.qml
         SOURCES repos/BaseRepository.h
         SOURCES
@@ -45,7 +45,7 @@ qt_add_qml_module(appuntitled1
         SOURCES services/usersservice.h services/usersservice.cpp
         SOURCES services/emotionsservice.h services/emotionsservice.cpp
         SOURCES services/acheivmentsservice.h services/acheivmentsservice.cpp
-        SOURCES services/dailystatistics.h services/dailystatistics.cpp
+        SOURCES services/dailystatisticsservice.h services/dailystatisticsservice.cpp
         SOURCES services/consumedservice.h services/consumedservice.cpp
         SOURCES services/exerciseservice.h services/exerciseservice.cpp
         #SOURCES service/BaseService.h

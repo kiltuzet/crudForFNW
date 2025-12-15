@@ -1,6 +1,6 @@
 #include "recipeservice.h"
 
-RecipesService::RecipesService(const QSqlDatabase& db, QObject* parent)
+/*RecipesService::RecipesService(const QSqlDatabase& db, QObject* parent)
     : BaseService(db, parent),
     m_recipes(new RecipesRepository(this)),
     m_ingredients(new RecipeIngredientsRepository(this)),
@@ -8,7 +8,7 @@ RecipesService::RecipesService(const QSqlDatabase& db, QObject* parent)
     m_recipes->setDatabase(db);
     m_ingredients->setDatabase(db);
     m_products->setDatabase(db);
-}
+}*/
 
 QVariantMap RecipesService::createRecipe(const QString& name, const QList<int>& productIds) {
     if (!beginTransaction()) return makeResponse(false, "Ошибка транзакции");
@@ -55,7 +55,8 @@ QVariantMap RecipesService::createRecipe(const QString& name, const QList<int>& 
     return makeResponse(true, "Рецепт создан", payload);
 }
 
-QVariantMap RecipesService::deleteRecipe(int recipeId) {
+//QVariantMap
+bool RecipesService::deleteRecipe(int recipeId) {
     bool ok = m_recipes->deleteRecipeWithIngredients(recipeId);
-    return makeResponse(ok, ok ? "Рецепт удалён" : "Ошибка удаления");
+    return ok; //makeResponse(ok, ok ? "Рецепт удалён" : "Ошибка удаления");
 }

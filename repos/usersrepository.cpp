@@ -1,4 +1,4 @@
-#include "UsersRepository.h"
+#include "usersrepository.h"
 
 UsersRepository::UsersRepository(QObject *parent)
     : BaseRepository("users", {"id","name","age","gender","height","weight","goal","activity_level"}, parent) {}

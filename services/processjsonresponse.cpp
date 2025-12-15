@@ -1,4 +1,4 @@
-/*#include "processjsonresponse.h"
+#include "processjsonresponse.h"
 #include <QDebug>
 
 ProcessJsonResponse::ProcessJsonResponse(QObject* parent) : QObject(parent) {}
@@ -120,12 +120,7 @@ void ProcessJsonResponse::handleProducts(const QJsonArray& arr, ProductsReposito
             qWarning() << "Skipping invalid product entry:" << o;
             continue;
         }
-        productsRepo.createProduct(o["name"].toString(),
-                                   o["quantity"].toDouble(),
-                                   o["unit"].toString(),
-                                   o["proteins"].toDouble(),
-                                   o["fats"].toDouble(),
-                                   o["carbs"].toDouble());
+        productsRepo.createProduct( o.toVariantMap());
     }
 }
 
@@ -184,13 +179,7 @@ void ProcessJsonResponse::handleRecipes(const QJsonArray& arr, RecipesRepository
                 qWarning() << "Skipping invalid ingredient entry:" << io;
                 continue;
             }
-            ingredientsRepo.createIngredient(rid,
-                                             io["name"].toString(),
-                                             io["quantity"].toDouble(),
-                                             io["unit"].toString(),
-                                             io["proteins"].toDouble(),
-                                             io["fats"].toDouble(),
-                                             io["carbs"].toDouble());
+            ingredientsRepo.createOrUpdate(rid,io.toVariantMap());
         }
     }
 }
@@ -228,4 +217,4 @@ void ProcessJsonResponse::updateDailyStats(int userId, const QString& dayISO, do
     statsRepo.createOrUpdateDailyStatistics(userId, dayISO, waterMl,
                                             totalProteins, totalFats, totalCarbs, totalCalories);
 }
-*/
+

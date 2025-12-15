@@ -1,18 +1,17 @@
-#include "ProductsRepository.h"
-
+#include "productsrepository.h"
 ProductsRepository::ProductsRepository(QObject *parent)
     : BaseRepository("products", {"id","name","quantity","unit","proteins","fats","carbs"}, parent) {}
 
-int ProductsRepository::createProduct(const QString &name, double quantity, const QString &unit,
-                                      double proteins, double fats, double carbs) {
-    QVariantMap values;
+int ProductsRepository::createProduct(QVariantMap values) {
+  /*  QVariantMap values;
     values["name"] = name;
     values["quantity"] = quantity;
     values["unit"] = unit;
     values["proteins"] = proteins;
     values["fats"] = fats;
     values["carbs"] = carbs;
-    return create(values);
+*/
+return create(values);
 }
 
 QVariantMap ProductsRepository::getProduct(int id) { return getById(id); }
@@ -27,14 +26,13 @@ bool ProductsRepository::updateProduct(int id, const QString &name, double quant
 
 bool ProductsRepository::deleteProduct(int id) { return deleteById(id); }
 
-bool ProductsRepository::createOrUpdateProduct(int id, const QString &name, double quantity, const QString &unit,
-                                               double proteins, double fats, double carbs) {
-    QVariantMap values;
+bool ProductsRepository::createOrUpdateProduct(int id,QVariantMap values) {
+  /*  QVariantMap values;
     values["name"] = name;
     values["quantity"] = quantity;
     values["unit"] = unit;
     values["proteins"] = proteins;
     values["fats"] = fats;
-    values["carbs"] = carbs;
+    values["carbs"] = carbs;*/
     return createOrUpdate(id, values);
 }

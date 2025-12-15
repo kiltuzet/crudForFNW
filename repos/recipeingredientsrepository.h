@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseRepository.h"
-
+#include "recipesrepository.h"
+#include "productsrepository.h"
 class RecipeIngredientsRepository : public BaseRepository {
     Q_OBJECT
 public:
@@ -17,5 +18,5 @@ public:
 
     bool removeProductFromRecipe(int recipeId, int productId);
 
-    int addProductToRecipe(int recipeId, int productId);
+    //int addProductToRecipe(int recipeId, int productId);
 };

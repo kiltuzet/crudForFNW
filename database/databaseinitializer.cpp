@@ -10,8 +10,37 @@
 #include <QTextCodec>
 #endif
 
-DatabaseInitializer::DatabaseInitializer(QObject *parent) : QObject(parent) {}
+DatabaseInitializer::DatabaseInitializer(const QSqlDatabase& db,
+                                         const QString& dbFilePath)
+    : m_db(db)
+    , m_dbFilePath(dbFilePath)
+{
+}
 
+bool DatabaseInitializer::initializeIfNotExists(const QString& sqlFilePath)
+{
+    // 🔹 Если файл БД уже есть — ничего не делаем
+    if (QFile::exists(m_dbFilePath)) {
+        qDebug() << "Database already exists:" << m_dbFilePath;
+        return true;
+    }
+
+    qDebug() << "Database not found, creating:" << m_dbFilePath;
+
+    if (!m_db.isOpen()) {
+        qCritical() << "Database is not open";
+        return false;
+    }
+
+    // 🔹 Создание структуры через SQL
+    if (!executeSqlFile(sqlFilePath, m_db)) {
+        qCritical() << "Failed to execute schema SQL";
+        return false;
+    }
+
+    qDebug() << "Database successfully initialized";
+    return true;
+}
 QString DatabaseInitializer::readSqlFileWithEncodingDetection(const QString &sqlFilePath)
 {
     QFile file(sqlFilePath);

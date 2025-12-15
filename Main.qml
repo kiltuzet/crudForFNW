@@ -1,223 +1,155 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import com.nutrition.converter 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 
 ApplicationWindow {
-    width: 900
-    height: 600
     visible: true
-    title: "Nutrition JSON → SQL Tester"
-
-    property string databasePath: "nutrition_app.db"
-    property int testUserId: 1
-
-    // Лог + пагинация
-    property var logLines: []        // каждая строка — отдельный элемент массива
-    property int pageSize: 50
-    property int currentPage: 0
-    property int logVersion: 0       // триггер перерисовки
-
-    // Видимый текст текущей страницы
-    property string visibleText: getVisibleText()
-
-    function getVisibleText() {
-        const start = currentPage * pageSize
-        const end   = (currentPage + 1) * pageSize
-        return logLines.slice(start, end).join("\n")
-    }
-
-    // Добавить одну строку
-    function appendLine(line) {
-        logLines.push(line)
-        logVersion++
-    }
-
-    // Добавить многострочный блок как отдельные строки
-    function appendBlock(text) {
-        const lines = String(text).split(/\r?\n/)
-        for (var i = 0; i < lines.length; ++i) {
-            appendLine(lines[i])
-        }
-        // Автопереход на последнюю страницу при новых записях (можно отключить)
-        currentPage = Math.max(0, Math.ceil(logLines.length / pageSize) - 1)
-    }
-
-    // Перерисовка при изменениях
-    onCurrentPageChanged: visibleText = getVisibleText()
-    onPageSizeChanged:    visibleText = getVisibleText()
-    onLogVersionChanged:  visibleText = getVisibleText()
+    width: 1000
+    height: 700
+    title: "JSON → Services → SQLite"
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: 12
+        spacing: 8
+        padding: 8
 
-        GroupBox {
-            title: "Подключение к базе данных"
-            Layout.fillWidth: true
-
-            RowLayout {
-                spacing: 10
-                Layout.fillWidth: true
-
-                TextField {
-                    id: dbPathField
-                    Layout.fillWidth: true
-                    text: databasePath
-                    placeholderText: "Путь к базе..."
-                }
-
-                Button {
-                    text: "Инициализировать"
-                    onClicked: {
-                        const ok = nutritionConverter.initDatabase(dbPathField.text, ":/bdext.sql")
-                        appendLine(ok ? "[INIT] База подключена" : "[INIT] Ошибка подключения")
-                    }
-                }
-
-                Label { text: nutritionConverter.isConnected ? "Подключено" : "Нет подключения" }
-            }
+        Label {
+            text: "Input JSON"
+            font.pixelSize: 16
         }
 
-        GroupBox {
-            title: "Ввод JSON"
+        TextArea {
+            id: inputJson
             Layout.fillWidth: true
-            Layout.preferredHeight: 250
-
-            TextArea {
-                id: jsonInput
-                textFormat: TextEdit.PlainText
-                wrapMode: TextArea.Wrap
-                placeholderText: "{ \"consumed\": [...], \"emotions\": [...] }"
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
+            Layout.fillHeight: true
+            wrapMode: TextArea.Wrap
+            font.family: "monospace"
+            text: `{
+  "userId": 1,
+  "date": "2025-01-01",
+  "emotions": [
+    { "name": "positive", "classification": "POSITIVE" }
+  ],
+  "consumed": [
+    {
+      "productName": "гречка",
+      "quantity": 200,
+      "unit": "g",
+      "proteins": 6,
+      "fats": 2,
+      "carbs": 40,
+      "calories": 180,
+      "timestamp": "08:30"
+    }
+  ],
+  "exercises": [
+    {
+      "exerciseName": "running",
+      "duration": 30,
+      "caloriesBurned": 250,
+      "timestamp": "18:00"
+    }
+  ]
+}`
         }
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: 10
 
             Button {
-                text: "Отправить JSON"
-                enabled: nutritionConverter.isConnected
-                onClicked: {
-                    if (jsonInput.text.length === 0) {
-                        appendLine("[PROCESS] Пустой JSON")
-                        return
-                    }
-                    nutritionConverter.processJsonResponse(jsonInput.text, testUserId)
-                }
+                text: "Process JSON"
+                onClicked: processJson()
             }
 
-            Button {
-                text: "Показать сегодняшнюю статистику"
-                enabled: nutritionConverter.isConnected
-                onClicked: {
-                    const stats = nutritionConverter.getConsumedToday(testUserId, "")
-                    appendLine("=== DAILY STATS ===")
-                    console.log(stats);
-                    appendBlock(JSON.stringify(stats, null, 4))
-                }
-            }
-
-            Button {
-                text: "Показать продукты"
-                enabled: nutritionConverter.isConnected
-                onClicked: {
-                    const p = nutritionConverter.getAllProducts()
-                    appendLine("=== PRODUCTS LIST ===")
-                    appendBlock(JSON.stringify(p, null, 4))
-                }
-            }
-
-            Button {
-                text: "Показать эмоции"
-                enabled: nutritionConverter.isConnected
-                onClicked: {
-                    const e = nutritionConverter.getAllEmotions()
-                    appendLine("=== EMOTIONS LIST ===")
-                    appendBlock(JSON.stringify(e, null, 4))
-                }
-            }
-
-            Button {
-                text: "Показать упражнения"
-                enabled: nutritionConverter.isConnected
-                onClicked: {
-                    const ex = nutritionConverter.getExerciseEntriesByUser(testUserId, "")
-                    appendLine("=== EXERCISES LIST ===")
-                    appendBlock(JSON.stringify(ex, null, 4))
-                }
-            }
-
-            Button {
-                text: "Показать пользователей"
-                enabled: nutritionConverter.isConnected
-                onClicked: {
-                    const u = nutritionConverter.getAllUsers()
-                    appendLine("=== USERS LIST ===")
-                    appendBlock(JSON.stringify(u, null, 4))
-                }
-            }
-
-            Button {
-                text: "Очистить лог"
-                enabled: true
-                onClicked: {
-                    logLines = []
-                    logVersion++
-                    currentPage = 0
-                }
+            Label {
+                id: statusLabel
+                text: ""
+                Layout.fillWidth: true
+                color: "red"
             }
         }
 
-        GroupBox {
-            title: "Лог выполнения"
+        Label {
+            text: "Result (Daily statistics)"
+            font.pixelSize: 16
+        }
+
+        TextArea {
+            id: outputJson
             Layout.fillWidth: true
             Layout.fillHeight: true
-
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 6
-
-                TextArea {
-                    id: logArea
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    readOnly: true
-                    wrapMode: TextArea.Wrap
-                    text: visibleText
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: 10
-
-                    Button {
-                        text: "← Назад"
-                        enabled: currentPage > 0
-                        onClicked: currentPage--
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: "Страница " + (currentPage + 1) + " из " + Math.max(1, Math.ceil(logLines.length / pageSize))
-                    }
-
-                    Button {
-                        text: "Вперёд →"
-                        enabled: (currentPage + 1) * pageSize < logLines.length
-                        onClicked: currentPage++
-                    }
-                }
-            }
+            readOnly: true
+            font.family: "monospace"
         }
     }
 
-    Connections {
-        target: nutritionConverter
-        function onDataProcessed(success, message) { appendLine("[RESULT] " + message) }
-        function onErrorOccurred(msg) { appendLine("[ERROR] " + msg) }
+    function processJson() {
+        statusLabel.text = ""
+
+        let data
+        try {
+            data = JSON.parse(inputJson.text)
+        } catch (e) {
+            statusLabel.text = "Invalid JSON: " + e
+            return
+        }
+
+        try {
+            // 🔹 EMOTIONS
+            if (data.emotions) {
+                for (let e of data.emotions) {
+                    EmotionsService.addEmotion(
+                        e.name,
+                        e.classification
+                    )
+                }
+            }
+
+            // 🔹 CONSUMED
+            if (data.consumed) {
+                for (let c of data.consumed) {
+                    ConsumedService.addConsumedEntry(
+                        data.userId,
+                        data.date,
+                        c.productName,
+                        c.quantity,
+                        c.unit,
+                        c.proteins,
+                        c.fats,
+                        c.carbs,
+                        c.calories,
+                        c.timestamp
+                    )
+                }
+            }
+
+            // 🔹 EXERCISES
+            if (data.exercises) {
+                for (let ex of data.exercises) {
+                    ExerciseService.addExerciseEntry(
+                        data.userId,
+                        data.date,
+                        ex.exerciseName,
+                        ex.duration,
+                        ex.caloriesBurned,
+                        ex.timestamp
+                    )
+                }
+            }
+
+            // 🔹 LOAD RESULT
+            const stats = DailyStatisticsService.getDailyStatistics(
+                data.userId,
+                data.date
+            )
+
+            outputJson.text = JSON.stringify(stats, null, 2)
+            statusLabel.text = "OK"
+            statusLabel.color = "green"
+
+        } catch (e) {
+            statusLabel.text = "Runtime error: " + e
+            statusLabel.color = "red"
+        }
     }
 }

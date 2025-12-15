@@ -1,4 +1,4 @@
-#include "dailystatistics.h"
+#include "dailystatisticsservice.h"
 
 DailyStatisticsService::DailyStatisticsService(const QSqlDatabase& db, QObject* parent)
     : BaseService(db, parent), m_repo(new DailyStatisticsRepository(this)) {

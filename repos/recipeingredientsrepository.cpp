@@ -6,12 +6,12 @@
 RecipeIngredientsRepository::RecipeIngredientsRepository(QObject *parent)
     : BaseRepository("recipe_ingredients", {"id","recipe_id","product_id"}, parent) {}
 
-int RecipeIngredientsRepository::addProductToRecipe(int recipeId, int productId) {
+/*int RecipeIngredientsRepository::addProductToRecipe(int recipeId, int productId) {
     QVariantMap values;
     values["recipe_id"] = recipeId;
     values["product_id"] = productId;
     return create(values);
-}
+}*/
 
 QVariantList RecipeIngredientsRepository::getProductsForRecipe(int recipeId) {
     QVariantList out;

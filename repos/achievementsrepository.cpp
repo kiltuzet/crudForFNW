@@ -1,4 +1,4 @@
-#include "AchievementsRepository.h"
+#include "achievementsrepository.h"
 
 AchievementsRepository::AchievementsRepository(QObject *parent)
     : BaseRepository("achievements", {"id","name","unlocked","description"}, parent) {}

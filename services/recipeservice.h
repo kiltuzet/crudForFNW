@@ -15,7 +15,7 @@ public:
         m_products->setDatabase(db);
     }
 
-    Q_INVOKABLE int createRecipe(const QString& name, const QList<int>& productIds);
+    Q_INVOKABLE QVariantMap createRecipe(const QString& name, const QList<int>& productIds);
     Q_INVOKABLE bool deleteRecipe(int recipeId);
 
 private:

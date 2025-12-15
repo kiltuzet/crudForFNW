@@ -5,14 +5,14 @@ ProductsService::ProductsService(const QSqlDatabase& db, QObject* parent)
     m_repo->setDatabase(db);
 }
 
-QVariantMap ProductsService::createProduct(const QString& name, double quantity,
+QVariantMap ProductsService::createProduct(QVariantMap product)/*const QString& name, double quantity,
                                            const QString& unit,
-                                           double proteins, double fats, double carbs) {
-    int id = m_repo->createProduct(name, quantity, unit, proteins, fats, carbs);
+                                           double proteins, double fats, double carbs*/ {
+    int id = m_repo->createProduct(product);
 
     QVariantMap payload;
     payload["id"] = id;
-    payload["name"] = name;
+    payload["name"] = product["name"];
 
     return makeResponse(id != -1,
                         id != -1 ? "Продукт создан" : "Ошибка создания продукта",

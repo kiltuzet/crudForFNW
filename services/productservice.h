@@ -8,10 +8,10 @@ public:
     explicit ProductsService(const QSqlDatabase& db, QObject* parent = nullptr);
 
     // Создание продукта
-    Q_INVOKABLE QVariantMap createProduct(const QString& name, double quantity,
+    Q_INVOKABLE QVariantMap createProduct(QVariantMap product);
+/*const QString& name, double quantity,
                                           const QString& unit,
-                                          double proteins, double fats, double carbs);
-
+                                          double proteins, double fats, double carbs*/
     // Получение продукта по id
     Q_INVOKABLE QVariantMap getProduct(int id);
 
