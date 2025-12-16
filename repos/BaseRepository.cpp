@@ -12,7 +12,9 @@ int BaseRepository::create(const QVariantMap &values) {
     QSqlQuery q(m_db);
     q.prepare(QString("INSERT INTO %1 (%2) VALUES (%3)")
                   .arg(m_table, cols.join(", "), params.join(", ")));
-
+    //отладка
+    qDebug()<<QString("INSERT INTO %1 (%2) VALUES (%3)")
+                    .arg(m_table, cols.join(", "), params.join(", "));
     for (auto it = values.begin(); it != values.end(); ++it)
         q.bindValue(":" + it.key(), it.value());
 

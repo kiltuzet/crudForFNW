@@ -2,6 +2,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
+#include <QDateTime>
 
 ConsumedRepository::ConsumedRepository(QObject *parent)
     : BaseRepository("consumed_entries",
@@ -17,7 +18,7 @@ int ConsumedRepository::createConsumedEntry(int userId, const QString &date,
                                             const QString &timestamp) {
     QVariantMap values;
     values["user_id"] = userId;
-    values["date"] = date;
+    values["date"] =  QDate::currentDate().toString("yyyy-MM-dd");
     values["product_name"] = productName;
     values["quantity"] = quantity;
     values["unit"] = unit;
@@ -25,7 +26,9 @@ int ConsumedRepository::createConsumedEntry(int userId, const QString &date,
     values["fats"] = fats;
     values["carbs"] = carbs;
     values["calories"] = calories;
-    values["timestamp"] = timestamp;
+    values["timestamp"] =;
+    qDebug()<<"consumed entry data:";
+    qDebug()<<values;
     return create(values);
 }
 

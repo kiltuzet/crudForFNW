@@ -19,6 +19,7 @@ qt_add_qml_module(appuntitled1
     URI untitled1
     QML_FILES
         Main.qml
+      #  PaginatedListView.qml
         SOURCES
         SOURCES
         SOURCES database/databaseconnection.cpp database/databaseconnection.h database/databaseinitializer.cpp database/databaseinitializer.h repos/productsrepository.cpp repos/productsrepository.h
@@ -66,10 +67,13 @@ target_link_libraries(appuntitled1
     PRIVATE Qt6::Quick
     Qt6::Sql
 )
+
 qt6_add_resources(appuntitled1 "application_resources"
     PREFIX "/"
     FILES
         bdext.sql
+        Main.qml
+        PaginatedListView.qml
 )
 target_link_libraries(appuntitled1 PRIVATE Qt6::Core)
 target_link_libraries(appuntitled1 PRIVATE Qt6::Core)

@@ -19,6 +19,7 @@ DatabaseInitializer::DatabaseInitializer(const QSqlDatabase& db,
 
 bool DatabaseInitializer::initializeIfNotExists(const QString& sqlFilePath)
 {
+    qDebug()<<"start in initializeIfNotExists";
     // 🔹 Если файл БД уже есть — ничего не делаем
     if (QFile::exists(m_dbFilePath)) {
         qDebug() << "Database already exists:" << m_dbFilePath;
@@ -27,10 +28,10 @@ bool DatabaseInitializer::initializeIfNotExists(const QString& sqlFilePath)
 
     qDebug() << "Database not found, creating:" << m_dbFilePath;
 
-    if (!m_db.isOpen()) {
+   /* if (!m_db.isOpen()) {
         qCritical() << "Database is not open";
         return false;
-    }
+    }*/
 
     // 🔹 Создание структуры через SQL
     if (!executeSqlFile(sqlFilePath, m_db)) {
@@ -75,6 +76,7 @@ bool DatabaseInitializer::executeSqlFile(const QString &sqlFilePath, const QSqlD
     }
 
     QString sqlAll = readSqlFileWithEncodingDetection(sqlFilePath);
+
     if (sqlAll.isEmpty()) {
         qWarning() << "executeSqlFile: sql file empty or unreadable";
         return false;
@@ -110,4 +112,20 @@ bool DatabaseInitializer::executeSqlFile(const QString &sqlFilePath, const QSqlD
     }
 
     return ok;
+}
+bool DatabaseInitializer::isDatabaseEmpty() {
+    if (!m_db.isOpen()) return true;
+
+    QStringList tables = m_db.tables();
+    if (tables.isEmpty()) return true;
+
+    QSqlQuery q(m_db);
+    for (const QString& table : tables) {
+        if (!q.exec(QString("SELECT COUNT(*) FROM %1").arg(table)))
+            continue;
+        if (q.next() && q.value(0).toInt() > 0) {
+            return false; // нашли хотя бы одну запись
+        }
+    }
+    return true; // все таблицы пустые
 }

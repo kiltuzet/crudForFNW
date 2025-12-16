@@ -9,7 +9,7 @@ public:
     explicit DatabaseInitializer(const QSqlDatabase& db,
                                  const QString& dbFilePath);
         bool initializeIfNotExists(const QString& sqlFilePath);
-
+    bool isDatabaseEmpty();
     // Execute sqlFilePath into provided db (by name). Returns true if all good.
     bool executeSqlFile(const QString &sqlFilePath, const QSqlDatabase &db);
 
