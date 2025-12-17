@@ -7,12 +7,7 @@ public:
     explicit DailyStatisticsRepository(QObject *parent = nullptr);
 
     // Специфичные методы
-    bool createOrUpdateDailyStatistics(int userId, const QString &date,
-                                       double waterMl,
-                                       double totalProteins,
-                                       double totalFats,
-                                       double totalCarbs,
-                                       double totalCalories);
+    bool createOrUpdateDailyStatistics(int userId, QVariantMap values);
 
     QVariantMap getDailyStatisticsRecord(int userId, const QString &date);
     QVariantList getDailyStatisticsRange(int userId, const QString &startDate, const QString &endDate);

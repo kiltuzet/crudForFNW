@@ -83,7 +83,7 @@ void ProcessJsonResponse::handleConsumed(const QJsonArray& arr, int userId, cons
             qWarning() << "Skipping invalid consumed entry:" << o;
             continue;
         }
-        consumedRepo.createConsumedEntry(userId, dayISO,
+        /*consumedRepo.createConsumedEntry(userId, dayISO,
                                          o["name"].toString(),
                                          o["quantity"].toDouble(),
                                          o["unit"].toString(),
@@ -91,7 +91,7 @@ void ProcessJsonResponse::handleConsumed(const QJsonArray& arr, int userId, cons
                                          o["fats"].toDouble(),
                                          o["carbs"].toDouble(),
                                          o["calories"].toDouble(),
-                                         tsISO);
+                                         tsISO);*/
     }
 }
 
@@ -214,7 +214,7 @@ void ProcessJsonResponse::updateDailyStats(int userId, const QString& dayISO, do
         totalCarbs    += m.value("carbs").toDouble();
         totalCalories += m.value("calories").toDouble();
     }
-    statsRepo.createOrUpdateDailyStatistics(userId, dayISO, waterMl,
-                                            totalProteins, totalFats, totalCarbs, totalCalories);
+   /* statsRepo.createOrUpdateDailyStatistics(userId, dayISO, waterMl,
+                                            totalProteins, totalFats, totalCarbs, totalCalories);*/
 }
 

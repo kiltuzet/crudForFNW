@@ -91,10 +91,7 @@ ApplicationWindow {
                     if (data.consumed) {
                         for (let c of data.consumed) {
                             ConsumedService.addConsumedEntry(
-                                data.userId, data.date,
-                                c.productName, c.quantity, c.unit,
-                                c.proteins, c.fats, c.carbs, c.calories,
-                                c.timestamp
+                               data
                             )
                         }
                         appendLine("[PROCESS] Consumed entries added")

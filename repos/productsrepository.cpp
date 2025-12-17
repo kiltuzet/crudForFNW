@@ -14,6 +14,9 @@ int ProductsRepository::createProduct(QVariantMap values) {
 return create(values);
 }
 
+QVariantMap ProductsRepository::getProductByName(const QString &name){
+    return getByField("name",name);
+}
 QVariantMap ProductsRepository::getProduct(int id) { return getById(id); }
 QVariantList ProductsRepository::getAllProducts() { return getAll(); }
 

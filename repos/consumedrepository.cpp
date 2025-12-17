@@ -10,25 +10,20 @@ ConsumedRepository::ConsumedRepository(QObject *parent)
                       "proteins","fats","carbs","calories","timestamp"},
                      parent) {}
 
-int ConsumedRepository::createConsumedEntry(int userId, const QString &date,
-                                            const QString &productName,
-                                            double quantity, const QString &unit,
-                                            double proteins, double fats,
-                                            double carbs, double calories,
-                                            const QString &timestamp) {
-    QVariantMap values;
-    values["user_id"] = userId;
+int ConsumedRepository::createConsumedEntry(QVariantMap values) {
+
+    //values["user_id"] = userId;
     values["date"] =  QDate::currentDate().toString("yyyy-MM-dd");
-    values["product_name"] = productName;
-    values["quantity"] = quantity;
-    values["unit"] = unit;
-    values["proteins"] = proteins;
-    values["fats"] = fats;
-    values["carbs"] = carbs;
-    values["calories"] = calories;
-    values["timestamp"] =;
-    qDebug()<<"consumed entry data:";
-    qDebug()<<values;
+    //values["product_name"] = productName;
+    //values["quantity"] = quantity;
+    //values["unit"] = unit;
+   // values["proteins"] = proteins;
+   // values["fats"] = fats;
+    //values["carbs"] = carbs;
+    //values["calories"] = calories;
+    values["timestamp"] =QTime::currentTime().toString("hh-mm-ss");
+   // qDebug()<<"consumed entry data:";
+   // qDebug()<<values;
     return create(values);
 }
 

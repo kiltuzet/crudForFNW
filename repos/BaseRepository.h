@@ -18,7 +18,9 @@ public:
     explicit BaseRepository(const QString &table,
                             const QStringList &fields,
                             QObject *parent=nullptr)
-        : QObject(parent), m_table(table), m_fields(fields) {}
+        : QObject(parent), m_table(table), m_fields(fields) {
+        qDebug()<<m_table;
+        qDebug()<<m_fields;}
 
     void setDatabase(const QSqlDatabase &db) { m_db = db; }
 

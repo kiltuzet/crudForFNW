@@ -1,0 +1,2689 @@
+
+--- .\bdext.sql ---
+--    nutrition_app.db
+-- SQLite database schema and initial data
+
+-- 1.  
+CREATE TABLE IF NOT EXISTS achievements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    unlocked BOOLEAN NOT NULL DEFAULT 0,
+    description TEXT
+);
+
+-- 2.  
+CREATE TABLE IF NOT EXISTS products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    quantity REAL NOT NULL,
+    unit TEXT NOT NULL,
+    proteins REAL NOT NULL,
+    fats REAL NOT NULL,
+    carbs REAL NOT NULL
+);
+
+-- 3.  
+CREATE TABLE IF NOT EXISTS recipes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    quantity REAL NOT NULL,
+    unit TEXT NOT NULL,
+    proteins REAL NOT NULL,
+    fats REAL NOT NULL,
+    carbs REAL NOT NULL
+);
+
+-- 4.         
+CREATE TABLE IF NOT EXISTS recipe_ingredients (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    recipe_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    quantity REAL NOT NULL,
+    unit TEXT NOT NULL,
+    proteins REAL NOT NULL,
+    fats REAL NOT NULL,
+    carbs REAL NOT NULL,
+    FOREIGN KEY (recipe_id) REFERENCES recipes(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- 5.  
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    age INTEGER NOT NULL,
+    gender TEXT NOT NULL CHECK (gender IN ('', '')),
+    height REAL NOT NULL,
+    weight REAL NOT NULL,
+    goal TEXT NOT NULL CHECK (goal IN (' ', ' ', ' ')),
+    activity_level INTEGER NOT NULL CHECK (activity_level BETWEEN 1 AND 4)
+);
+
+-- 6.  
+CREATE TABLE IF NOT EXISTS emotions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    classification TEXT NOT NULL
+);
+
+-- 7.  
+CREATE TABLE IF NOT EXISTS exercises (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    duration_minutes REAL NOT NULL,
+    calories_burned REAL NOT NULL
+);
+
+-- 8.   
+CREATE TABLE IF NOT EXISTS daily_statistics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    water_ml REAL NOT NULL DEFAULT 0,
+    total_proteins REAL NOT NULL DEFAULT 0,
+    total_fats REAL NOT NULL DEFAULT 0,
+    total_carbs REAL NOT NULL DEFAULT 0,
+    total_calories REAL NOT NULL DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE(user_id, date)
+);
+
+-- 9.  
+CREATE TABLE IF NOT EXISTS emotion_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    emotion_id INTEGER NOT NULL,
+    timestamp TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (emotion_id) REFERENCES emotions(id)
+);
+
+-- 10.   
+CREATE TABLE IF NOT EXISTS consumed_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    product_name TEXT NOT NULL,
+    quantity REAL NOT NULL,
+    unit TEXT NOT NULL,
+    proteins REAL NOT NULL,
+    fats REAL NOT NULL,
+    carbs REAL NOT NULL,
+    calories REAL NOT NULL,
+    timestamp TEXT ,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- 11.  
+CREATE TABLE IF NOT EXISTS exercise_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    exercise_name TEXT NOT NULL,
+    duration_minutes REAL NOT NULL,
+    calories_burned REAL NOT NULL,
+    timestamp TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+---------------------------------------------------------------------
+--  ------------------------------------------------------------
+---------------------------------------------------------------------
+
+-- 
+INSERT INTO achievements (name, unlocked, description) VALUES
+(' ', 0, '!     .'),
+(' ', 0, '!     .'),
+(' ', 0, '      .'),
+(' ', 0, '     .'),
+('  ', 0, '      .'),
+(' ', 0, '       .'),
+(' ', 0, '   1000    .');
+
+-- 
+INSERT INTO products (name, quantity, unit, proteins, fats, carbs) VALUES
+('', 100, '', 0, 0, 14),
+('', 100, '', 1, 0, 23),
+(' ', 100, '', 31, 4, 0),
+('', 100, '', 3, 0, 28),
+('', 100, '', 3, 0, 7),
+('', 100, '', 1, 0, 10),
+('', 100, '', 2, 0, 17),
+('', 100, '', 14, 4, 3),
+('', 100, '', 3, 1, 20),
+('', 100, '', 12, 7, 66);
+
+-- 
+INSERT INTO recipes (name, quantity, unit, proteins, fats, carbs) VALUES
+('   ', 100, '', 50, 6, 25),
+('   ', 100, '', 11, 6, 89),
+('   ', 100, '', 10, 3, 28),
+('- ', 100, '', 1, 0, 37),
+('    ', 100, '', 18, 5, 19);
+
+---------------------------------------------------------------------
+--    -----------------------------------------
+---------------------------------------------------------------------
+
+--   (recipe_id = 1)
+INSERT INTO recipe_ingredients
+(recipe_id, product_id, name, quantity, unit, proteins, fats, carbs) VALUES
+(1, 3, ' ', 150, '', 47, 5, 0),
+(1, 7, '', 100, '', 2, 0, 17),
+(1, 6, '', 50, '', 0, 0, 5),
+(1, 5, '', 50, '', 1, 0, 4);
+
+--   (recipe_id = 2)
+INSERT INTO recipe_ingredients
+(recipe_id, product_id, name, quantity, unit, proteins, fats, carbs) VALUES
+(2, 10, '', 80, '', 9, 5, 53),
+(2, 1, '', 100, '', 0, 0, 14),
+(2, 2, '', 50, '', 1, 0, 22);
+
+--    (recipe_id = 3)
+INSERT INTO recipe_ingredients
+(recipe_id, product_id, name, quantity, unit, proteins, fats, carbs) VALUES
+(3, 9, '', 100, '', 3, 1, 20),
+(3, 8, '', 50, '', 7, 2, 2),
+(3, 1, '', 50, '', 0, 0, 7);
+
+--  (recipe_id = 4)
+INSERT INTO recipe_ingredients
+(recipe_id, product_id, name, quantity, unit, proteins, fats, carbs) VALUES
+(4, 2, '', 100, '', 1, 0, 23),
+(4, 1, '', 100, '', 0, 0, 14);
+
+--  (recipe_id = 5)
+INSERT INTO recipe_ingredients
+(recipe_id, product_id, name, quantity, unit, proteins, fats, carbs) VALUES
+(5, 5, '', 150, '', 4, 1, 11),
+(5, 8, '', 100, '', 14, 4, 3),
+(5, 6, '', 50, '', 1, 0, 4);
+
+---------------------------------------------------------------------
+--  ------------------------------------------------------
+---------------------------------------------------------------------
+
+INSERT INTO users (name, age, gender, height, weight, goal, activity_level)
+VALUES ('User', 30, '', 180, 75, ' ', 2);
+
+---------------------------------------------------------------------
+--  -----------------------------------------------------------
+---------------------------------------------------------------------
+
+CREATE INDEX IF NOT EXISTS idx_daily_statistics_user_date ON daily_statistics(user_id, date);
+CREATE INDEX IF NOT EXISTS idx_consumed_entries_user_date ON consumed_entries(user_id, date);
+CREATE INDEX IF NOT EXISTS idx_exercise_entries_user_date ON exercise_entries(user_id, date);
+CREATE INDEX IF NOT EXISTS idx_emotion_entries_user ON emotion_entries(user_id);
+
+
+--- .\CMakeLists.txt ---
+cmake_minimum_required(VERSION 3.16)
+
+project(untitled1 VERSION 0.1 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Core Sql)
+find_package(Qt6 REQUIRED COMPONENTS Core)
+
+
+qt_standard_project_setup(REQUIRES 6.8)
+
+qt_add_executable(appuntitled1
+    main.cpp
+)
+
+qt_add_qml_module(appuntitled1
+    URI untitled1
+    QML_FILES
+        Main.qml
+      #  PaginatedListView.qml
+        SOURCES
+        SOURCES
+        SOURCES database/databaseconnection.cpp database/databaseconnection.h database/databaseinitializer.cpp database/databaseinitializer.h repos/productsrepository.cpp repos/productsrepository.h
+        SOURCES repos/achievementsrepository.h repos/achievementsrepository.cpp
+        SOURCES repos/usersrepository.h repos/usersrepository.cpp
+        SOURCES repos/recipesrepository.h repos/recipesrepository.cpp
+        SOURCES repos/recipeingredientsrepository.h repos/recipeingredientsrepository.cpp
+        SOURCES
+        SOURCES repos/emotionsrepository.h repos/emotionsrepository.cpp
+        SOURCES repos/consumedrepository.h repos/consumedrepository.cpp
+        SOURCES repos/exerciseentriesrepository.h repos/exerciseentriesrepository.cpp
+        SOURCES repos/dailystatisticsrepository.h repos/dailystatisticsrepository.cpp
+        RESOURCES resources.qrc
+        SOURCES services/processjsonresponse.h
+        SOURCES services/processjsonresponse.cpp
+        QML_FILES PaginatedListView.qml
+        SOURCES repos/BaseRepository.h
+        SOURCES
+        SOURCES repos/BaseRepository.cpp
+        SOURCES services/BaseService.h
+        SOURCES services/BaseService.cpp
+        SOURCES services/productservice.h services/productservice.cpp
+        SOURCES services/recipeservice.h services/recipeservice.cpp
+        SOURCES services/usersservice.h services/usersservice.cpp
+        SOURCES services/emotionsservice.h services/emotionsservice.cpp
+        SOURCES services/acheivmentsservice.h services/acheivmentsservice.cpp
+        SOURCES services/dailystatisticsservice.h services/dailystatisticsservice.cpp
+        SOURCES services/consumedservice.h services/consumedservice.cpp
+        SOURCES services/exerciseservice.h services/exerciseservice.cpp
+        #SOURCES service/BaseService.h
+)
+
+# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
+# If you are developing for iOS or macOS you should consider setting an
+# explicit, fixed bundle identifier manually though.
+set_target_properties(appuntitled1 PROPERTIES
+#    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appuntitled1
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+)
+
+target_link_libraries(appuntitled1
+    PRIVATE Qt6::Quick
+    Qt6::Sql
+)
+
+qt6_add_resources(appuntitled1 "application_resources"
+    PREFIX "/"
+    FILES
+        bdext.sql
+        Main.qml
+        PaginatedListView.qml
+)
+target_link_libraries(appuntitled1 PRIVATE Qt6::Core)
+target_link_libraries(appuntitled1 PRIVATE Qt6::Core)
+
+
+include(GNUInstallDirs)
+install(TARGETS appuntitled1
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+
+--- .\main.cpp ---
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include "database/databaseconnection.h"
+#include "database/databaseinitializer.h"
+#include "services/emotionsservice.h"
+#include "services/consumedservice.h"
+#include "services/exerciseservice.h"
+#include "services/dailystatisticsservice.h"
+
+int main(int argc, char *argv[])
+{
+    QGuiApplication app(argc, argv);
+
+    DatabaseConnection dbConn;
+    dbConn.open("nutrition.db");
+
+    DatabaseInitializer initializer(dbConn.database(), "nutrition.db");
+    initializer.initializeIfNotExists(":/bdext.sql");
+    if(initializer.isDatabaseEmpty()){
+        initializer.executeSqlFile(":/bdext.sql",dbConn.database());
+    }
+    EmotionsService emotions(dbConn.database());
+    ConsumedService consumed(dbConn.database());
+    ExerciseService exercise(dbConn.database());
+    DailyStatisticsService stats(dbConn.database());
+
+    QQmlApplicationEngine engine;
+    engine.rootContext()->setContextProperty("EmotionsService", &emotions);
+    engine.rootContext()->setContextProperty("ConsumedService", &consumed);
+    engine.rootContext()->setContextProperty("ExerciseService", &exercise);
+    engine.rootContext()->setContextProperty("DailyStatisticsService", &stats);
+
+    engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
+    if (engine.rootObjects().isEmpty()) return -1;
+
+    return app.exec();
+}
+
+
+--- .\project_dump.txt ---
+
+--- .\bdext.sql ---
+--    nutrition_app.db
+-- SQLite database schema and initial data
+
+-- 1.  
+CREATE TABLE IF NOT EXISTS achievements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    unlocked BOOLEAN NOT NULL DEFAULT 0,
+    description TEXT
+);
+
+-- 2.  
+CREATE TABLE IF NOT EXISTS products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    quantity REAL NOT NULL,
+    unit TEXT NOT NULL,
+    proteins REAL NOT NULL,
+    fats REAL NOT NULL,
+    carbs REAL NOT NULL
+);
+
+-- 3.  
+CREATE TABLE IF NOT EXISTS recipes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    quantity REAL NOT NULL,
+    unit TEXT NOT NULL,
+    proteins REAL NOT NULL,
+    fats REAL NOT NULL,
+    carbs REAL NOT NULL
+);
+
+-- 4.         
+CREATE TABLE IF NOT EXISTS recipe_ingredients (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    recipe_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    quantity REAL NOT NULL,
+    unit TEXT NOT NULL,
+    proteins REAL NOT NULL,
+    fats REAL NOT NULL,
+    carbs REAL NOT NULL,
+    FOREIGN KEY (recipe_id) REFERENCES recipes(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- 5.  
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    age INTEGER NOT NULL,
+    gender TEXT NOT NULL CHECK (gender IN ('', '')),
+    height REAL NOT NULL,
+    weight REAL NOT NULL,
+    goal TEXT NOT NULL CHECK (goal IN (' ', ' ', ' ')),
+    activity_level INTEGER NOT NULL CHECK (activity_level BETWEEN 1 AND 4)
+);
+
+-- 6.  
+CREATE TABLE IF NOT EXISTS emotions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    classification TEXT NOT NULL
+);
+
+-- 7.  
+CREATE TABLE IF NOT EXISTS exercises (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    duration_minutes REAL NOT NULL,
+    calories_burned REAL NOT NULL
+);
+
+-- 8.   
+CREATE TABLE IF NOT EXISTS daily_statistics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    water_ml REAL NOT NULL DEFAULT 0,
+    total_proteins REAL NOT NULL DEFAULT 0,
+    total_fats REAL NOT NULL DEFAULT 0,
+    total_carbs REAL NOT NULL DEFAULT 0,
+    total_calories REAL NOT NULL DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE(user_id, date)
+);
+
+-- 9.  
+CREATE TABLE IF NOT EXISTS emotion_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    emotion_id INTEGER NOT NULL,
+    timestamp TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (emotion_id) REFERENCES emotions(id)
+);
+
+-- 10.   
+CREATE TABLE IF NOT EXISTS consumed_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    product_name TEXT NOT NULL,
+    quantity REAL NOT NULL,
+    unit TEXT NOT NULL,
+    proteins REAL NOT NULL,
+    fats REAL NOT NULL,
+    carbs REAL NOT NULL,
+    calories REAL NOT NULL,
+    timestamp TEXT ,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- 11.  
+CREATE TABLE IF NOT EXISTS exercise_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    exercise_name TEXT NOT NULL,
+    duration_minutes REAL NOT NULL,
+    calories_burned REAL NOT NULL,
+    timestamp TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+---------------------------------------------------------------------
+--  ------------------------------------------------------------
+---------------------------------------------------------------------
+
+-- 
+INSERT INTO achievements (name, unlocked, description) VALUES
+(' ', 0, '!     .'),
+(' ', 0, '!     .'),
+(' ', 0, '      .'),
+(' ', 0, '     .'),
+('  ', 0, '      .'),
+(' ', 0, '       .'),
+(' ', 0, '   1000    .');
+
+-- 
+INSERT INTO products (name, quantity, unit, proteins, fats, carbs) VALUES
+('', 100, '', 0, 0, 14),
+('', 100, '', 1, 0, 23),
+(' ', 100, '', 31, 4, 0),
+('', 100, '', 3, 0, 28),
+('', 100, '', 3, 0, 7),
+('', 100, '', 1, 0, 10),
+('', 100, '', 2, 0, 17),
+('', 100, '', 14, 4, 3),
+('', 100, '', 3, 1, 20),
+('', 100, '', 12, 7, 66);
+
+-- 
+INSERT INTO recipes (name, quantity, unit, proteins, fats, carbs) VALUES
+('   ', 100, '', 50, 6, 25),
+('   ', 100, '', 11, 6, 89),
+('   ', 100, '', 10, 3, 28),
+('- ', 100, '', 1, 0, 37),
+('    ', 100, '', 18, 5, 19);
+
+---------------------------------------------------------------------
+--    -----------------------------------------
+---------------------------------------------------------------------
+
+--   (recipe_id = 1)
+INSERT INTO recipe_ingredients
+(recipe_id, product_id, name, quantity, unit, proteins, fats, carbs) VALUES
+(1, 3, ' ', 150, '', 47, 5, 0),
+(1, 7, '', 100, '', 2, 0, 17),
+(1, 6, '', 50, '', 0, 0, 5),
+(1, 5, '', 50, '', 1, 0, 4);
+
+--   (recipe_id = 2)
+INSERT INTO recipe_ingredients
+(recipe_id, product_id, name, quantity, unit, proteins, fats, carbs) VALUES
+(2, 10, '', 80, '', 9, 5, 53),
+(2, 1, '', 100, '', 0, 0, 14),
+(2, 2, '', 50, '', 1, 0, 22);
+
+--    (recipe_id = 3)
+INSERT INTO recipe_ingredients
+(recipe_id, product_id, name, quantity, unit, proteins, fats, carbs) VALUES
+(3, 9, '', 100, '', 3, 1, 20),
+(3, 8, '', 50, '', 7, 2, 2),
+(3, 1, '', 50, '', 0, 0, 7);
+
+--  (recipe_id = 4)
+INSERT INTO recipe_ingredients
+(recipe_id, product_id, name, quantity, unit, proteins, fats, carbs) VALUES
+(4, 2, '', 100, '', 1, 0, 23),
+(4, 1, '', 100, '', 0, 0, 14);
+
+--  (recipe_id = 5)
+INSERT INTO recipe_ingredients
+(recipe_id, product_id, name, quantity, unit, proteins, fats, carbs) VALUES
+(5, 5, '', 150, '', 4, 1, 11),
+(5, 8, '', 100, '', 14, 4, 3),
+(5, 6, '', 50, '', 1, 0, 4);
+
+---------------------------------------------------------------------
+--  ------------------------------------------------------
+---------------------------------------------------------------------
+
+INSERT INTO users (name, age, gender, height, weight, goal, activity_level)
+VALUES ('User', 30, '', 180, 75, ' ', 2);
+
+---------------------------------------------------------------------
+--  -----------------------------------------------------------
+---------------------------------------------------------------------
+
+CREATE INDEX IF NOT EXISTS idx_daily_statistics_user_date ON daily_statistics(user_id, date);
+CREATE INDEX IF NOT EXISTS idx_consumed_entries_user_date ON consumed_entries(user_id, date);
+CREATE INDEX IF NOT EXISTS idx_exercise_entries_user_date ON exercise_entries(user_id, date);
+CREATE INDEX IF NOT EXISTS idx_emotion_entries_user ON emotion_entries(user_id);
+
+
+--- .\CMakeLists.txt ---
+cmake_minimum_required(VERSION 3.16)
+
+project(untitled1 VERSION 0.1 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Core Sql)
+find_package(Qt6 REQUIRED COMPONENTS Core)
+
+
+qt_standard_project_setup(REQUIRES 6.8)
+
+qt_add_executable(appuntitled1
+    main.cpp
+)
+
+qt_add_qml_module(appuntitled1
+    URI untitled1
+    QML_FILES
+        Main.qml
+      #  PaginatedListView.qml
+        SOURCES
+        SOURCES
+        SOURCES database/databaseconnection.cpp database/databaseconnection.h database/databaseinitializer.cpp database/databaseinitializer.h repos/productsrepository.cpp repos/productsrepository.h
+        SOURCES repos/achievementsrepository.h repos/achievementsrepository.cpp
+        SOURCES repos/usersrepository.h repos/usersrepository.cpp
+        SOURCES repos/recipesrepository.h repos/recipesrepository.cpp
+        SOURCES repos/recipeingredientsrepository.h repos/recipeingredientsrepository.cpp
+        SOURCES
+        SOURCES repos/emotionsrepository.h repos/emotionsrepository.cpp
+        SOURCES repos/consumedrepository.h repos/consumedrepository.cpp
+        SOURCES repos/exerciseentriesrepository.h repos/exerciseentriesrepository.cpp
+        SOURCES repos/dailystatisticsrepository.h repos/dailystatisticsrepository.cpp
+        RESOURCES resources.qrc
+        SOURCES services/processjsonresponse.h
+        SOURCES services/processjsonresponse.cpp
+        QML_FILES PaginatedListView.qml
+        SOURCES repos/BaseRepository.h
+        SOURCES
+        SOURCES repos/BaseRepository.cpp
+        SOURCES services/BaseService.h
+        SOURCES services/BaseService.cpp
+        SOURCES services/productservice.h services/productservice.cpp
+        SOURCES services/recipeservice.h services/recipeservice.cpp
+        SOURCES services/usersservice.h services/usersservice.cpp
+        SOURCES services/emotionsservice.h services/emotionsservice.cpp
+        SOURCES services/acheivmentsservice.h services/acheivmentsservice.cpp
+        SOURCES services/dailystatisticsservice.h services/dailystatisticsservice.cpp
+        SOURCES services/consumedservice.h services/consumedservice.cpp
+        SOURCES services/exerciseservice.h services/exerciseservice.cpp
+        #SOURCES service/BaseService.h
+)
+
+# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
+# If you are developing for iOS or macOS you should consider setting an
+# explicit, fixed bundle identifier manually though.
+set_target_properties(appuntitled1 PROPERTIES
+#    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appuntitled1
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+)
+
+target_link_libraries(appuntitled1
+    PRIVATE Qt6::Quick
+    Qt6::Sql
+)
+
+qt6_add_resources(appuntitled1 "application_resources"
+    PREFIX "/"
+    FILES
+        bdext.sql
+        Main.qml
+        PaginatedListView.qml
+)
+target_link_libraries(appuntitled1 PRIVATE Qt6::Core)
+target_link_libraries(appuntitled1 PRIVATE Qt6::Core)
+
+
+include(GNUInstallDirs)
+install(TARGETS appuntitled1
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+
+--- .\TODO.txt ---
+          recipeingredientrepository
+,       reciperepository,   ,  :
+1.           .qml,
+     ,     recipe  ,  
+     recipeingridients  .  recipe_id *,      , 
+     
+2.     (     ),        id,:
+2.1              ,   
+   recipes ;
+2.2     recipes   id   ,      
+          ,     .
+2.3      ,      +  
+
+
+
+
+
+
+*     :
+     ,          ,   id:
+(1), (2), (3), (4),(5)
+       ,    +  ,     (1),
+  5    recipeingredients():
+(,1( ),1()),
+(,1( ),2()),
+(,1( ),3()),
+...
+
+
+
+--- .\database\databaseconnection.cpp ---
+#include "databaseconnection.h"
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QDebug>
+#include <QSqlDriver>
+
+DatabaseConnection::DatabaseConnection(QObject *parent)
+    : QObject(parent),
+    m_connectionName(QStringLiteral("app_connection"))
+{
+}
+
+DatabaseConnection::~DatabaseConnection()
+{
+    close();
+}
+
+bool DatabaseConnection::open(const QString &databasePath)
+{
+    if (m_db.isValid() && m_db.isOpen()) {
+        if (m_db.databaseName() == databasePath) return true;
+        close();
+    }
+
+    if (QSqlDatabase::contains(m_connectionName)) {
+        QSqlDatabase::removeDatabase(m_connectionName);
+    }
+
+    m_db = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), m_connectionName);
+    m_db.setDatabaseName(databasePath);
+
+    if (!m_db.open()) {
+        qCritical() << "DatabaseConnection::open failed:" << m_db.lastError().text();
+        return false;
+    }
+
+    // Pragmas
+    QSqlQuery q(m_db);
+    q.exec("PRAGMA foreign_keys = ON;");
+    q.exec("PRAGMA journal_mode = WAL;");
+    q.exec("PRAGMA synchronous = NORMAL;");
+
+    qDebug() << "Database opened:" << databasePath << "driver:" << m_db.driverName();
+    return true;
+}
+
+void DatabaseConnection::close()
+{
+    if (!m_db.isValid()) return;
+    QString name = m_db.connectionName();
+    m_db.close();
+    QSqlDatabase::removeDatabase(name);
+    m_db = QSqlDatabase();
+}
+
+bool DatabaseConnection::isOpen() const
+{
+    return m_db.isValid() && m_db.isOpen();
+}
+
+QSqlDatabase DatabaseConnection::database() const
+{
+    return m_db;
+}
+
+QString DatabaseConnection::connectionName() const
+{
+    return m_connectionName;
+}
+
+
+--- .\database\databaseconnection.h ---
+#pragma once
+#include <QObject>
+#include <QSqlDatabase>
+
+class DatabaseConnection : public QObject
+{
+    Q_OBJECT
+public:
+    explicit DatabaseConnection(QObject *parent = nullptr);
+    ~DatabaseConnection() override;
+
+    bool open(const QString &databasePath);
+    void close();
+    bool isOpen() const;
+    QSqlDatabase database() const;
+
+    // Useful convenience
+    QString connectionName() const;
+
+private:
+    QSqlDatabase m_db;
+    QString m_connectionName;
+};
+
+
+--- .\database\databaseinitializer.cpp ---
+#include "databaseinitializer.h"
+#include <QFile>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QDebug>
+
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QStringDecoder>
+#else
+#include <QTextCodec>
+#endif
+
+DatabaseInitializer::DatabaseInitializer(const QSqlDatabase& db,
+                                         const QString& dbFilePath)
+    : m_db(db)
+    , m_dbFilePath(dbFilePath)
+{
+}
+
+bool DatabaseInitializer::initializeIfNotExists(const QString& sqlFilePath)
+{
+    qDebug()<<"start in initializeIfNotExists";
+    // 🔹 Если файл БД уже есть — ничего не делаем
+    if (QFile::exists(m_dbFilePath)) {
+        qDebug() << "Database already exists:" << m_dbFilePath;
+        return true;
+    }
+
+    qDebug() << "Database not found, creating:" << m_dbFilePath;
+
+   /* if (!m_db.isOpen()) {
+        qCritical() << "Database is not open";
+        return false;
+    }*/
+
+    // 🔹 Создание структуры через SQL
+    if (!executeSqlFile(sqlFilePath, m_db)) {
+        qCritical() << "Failed to execute schema SQL";
+        return false;
+    }
+
+    qDebug() << "Database successfully initialized";
+    return true;
+}
+QString DatabaseInitializer::readSqlFileWithEncodingDetection(const QString &sqlFilePath)
+{
+    QFile file(sqlFilePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "Cannot open sql file:" << sqlFilePath;
+        return {};
+    }
+    QByteArray raw = file.readAll();
+    file.close();
+
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    QStringDecoder dUtf8(QStringDecoder::Encoding::Utf8);
+    QString s = dUtf8(raw);
+    if (!s.contains(QChar::ReplacementCharacter)) return s;
+    QStringDecoder dCp1251(QStringDecoder::Encoding::System);
+    return dCp1251(raw);
+#else
+    auto codecUtf8 = QTextCodec::codecForName("UTF-8");
+    QString s = codecUtf8->toUnicode(raw);
+    if (!s.contains(QChar::ReplacementCharacter)) return s;
+    auto codecWin = QTextCodec::codecForName("Windows-1251");
+    if (codecWin) return codecWin->toUnicode(raw);
+    return QString::fromLocal8Bit(raw);
+#endif
+}
+
+bool DatabaseInitializer::executeSqlFile(const QString &sqlFilePath, const QSqlDatabase &db)
+{
+    if (!db.isValid() || !db.isOpen()) {
+        qWarning() << "executeSqlFile: db not open";
+        return false;
+    }
+
+    QString sqlAll = readSqlFileWithEncodingDetection(sqlFilePath);
+
+    if (sqlAll.isEmpty()) {
+        qWarning() << "executeSqlFile: sql file empty or unreadable";
+        return false;
+    }
+
+    // Run in transaction
+    QSqlQuery q(db);
+    if (!q.exec("BEGIN;")) {
+        qWarning() << "BEGIN failed:" << q.lastError().text();
+        return false;
+    }
+
+    QStringList stmts = sqlAll.split(';', Qt::SkipEmptyParts);
+    bool ok = true;
+    for (QString piece : stmts) {
+        QString stmt = piece.trimmed();
+        if (stmt.isEmpty()) continue;
+        if (!q.exec(stmt)) {
+            qWarning() << "SQL error:" << q.lastError().text() << "stmt:" << stmt.left(200);
+            ok = false;
+            // continue trying others
+        }
+    }
+
+    if (ok) {
+        if (!q.exec("COMMIT;")) {
+            qWarning() << "COMMIT failed:" << q.lastError().text();
+            q.exec("ROLLBACK;");
+            return false;
+        }
+    } else {
+        q.exec("ROLLBACK;");
+    }
+
+    return ok;
+}
+bool DatabaseInitializer::isDatabaseEmpty() {
+    if (!m_db.isOpen()) return true;
+
+    QStringList tables = m_db.tables();
+    if (tables.isEmpty()) return true;
+
+    QSqlQuery q(m_db);
+    for (const QString& table : tables) {
+        if (!q.exec(QString("SELECT COUNT(*) FROM %1").arg(table)))
+            continue;
+        if (q.next() && q.value(0).toInt() > 0) {
+            return false; // нашли хотя бы одну запись
+        }
+    }
+    return true; // все таблицы пустые
+}
+
+
+--- .\database\databaseinitializer.h ---
+#pragma once
+#include <QObject>
+#include <QString>
+#include "databaseconnection.h"
+class DatabaseInitializer : public QObject
+{
+    Q_OBJECT
+public:
+    explicit DatabaseInitializer(const QSqlDatabase& db,
+                                 const QString& dbFilePath);
+        bool initializeIfNotExists(const QString& sqlFilePath);
+    bool isDatabaseEmpty();
+    // Execute sqlFilePath into provided db (by name). Returns true if all good.
+    bool executeSqlFile(const QString &sqlFilePath, const QSqlDatabase &db);
+
+private:
+    QString readSqlFileWithEncodingDetection(const QString &sqlFilePath);
+    QSqlDatabase m_db;
+    QString m_dbFilePath;
+};
+
+
+--- .\repos\achievementsrepository.cpp ---
+#include "achievementsrepository.h"
+
+AchievementsRepository::AchievementsRepository(QObject *parent)
+    : BaseRepository("achievements", {"id","name","unlocked","description"}, parent) {}
+
+int AchievementsRepository::createAchievement(const QString &name, const QString &description, bool unlocked) {
+    QVariantMap values;
+    values["name"] = name;
+    values["description"] = description;
+    values["unlocked"] = unlocked ? 1 : 0;
+    return create(values);
+}
+
+QVariantMap AchievementsRepository::getAchievement(int id) { return getById(id); }
+QVariantList AchievementsRepository::getAllAchievements() { return getAll(); }
+
+bool AchievementsRepository::updateAchievement(int id, const QString &name, const QString &description, bool unlocked) {
+    QVariantMap values;
+    values["name"] = name;
+    values["description"] = description;
+    values["unlocked"] = unlocked ? 1 : 0;
+    return update(id, values);
+}
+
+bool AchievementsRepository::deleteAchievement(int id) { return deleteById(id); }
+
+bool AchievementsRepository::createOrUpdateAchievement(int id, const QString &name, const QString &description, bool unlocked) {
+    QVariantMap values;
+    values["name"] = name;
+    values["description"] = description;
+    values["unlocked"] = unlocked ? 1 : 0;
+    return createOrUpdate(id, values);
+}
+
+
+--- .\repos\achievementsrepository.h ---
+#pragma once
+#include "BaseRepository.h"
+
+class AchievementsRepository : public BaseRepository {
+    Q_OBJECT
+public:
+    explicit AchievementsRepository(QObject *parent=nullptr);
+
+    int createAchievement(const QString &name, const QString &description, bool unlocked);
+    QVariantMap getAchievement(int id);
+    QVariantList getAllAchievements();
+    bool updateAchievement(int id, const QString &name, const QString &description, bool unlocked);
+    bool deleteAchievement(int id);
+    bool createOrUpdateAchievement(int id, const QString &name, const QString &description, bool unlocked);
+};
+
+
+--- .\repos\BaseRepository.cpp ---
+#include "BaseRepository.h"
+
+int BaseRepository::create(const QVariantMap &values) {
+    if (!m_db.isValid() || !m_db.isOpen()) return -1;
+
+    QStringList cols, params;
+    for (auto it = values.begin(); it != values.end(); ++it) {
+        cols << it.key();
+        params << ":" + it.key();
+    }
+
+    QSqlQuery q(m_db);
+    q.prepare(QString("INSERT INTO %1 (%2) VALUES (%3)")
+                  .arg(m_table, cols.join(", "), params.join(", ")));
+    //отладка
+    qDebug()<<QString("INSERT INTO %1 (%2) VALUES (%3)")
+                    .arg(m_table, cols.join(", "), params.join(", "));
+    for (auto it = values.begin(); it != values.end(); ++it)
+        q.bindValue(":" + it.key(), it.value());
+    qDebug()<<QString(q.executedQuery());
+    if (!q.exec()) {
+        qWarning() << "Insert failed:" << q.lastError().text();
+        return -1;
+    }
+    return q.lastInsertId().toInt();
+}
+
+QVariantMap BaseRepository::getById(int id) {
+    QVariantMap r;
+    if (!m_db.isValid() || !m_db.isOpen()) return r;
+
+    QSqlQuery q(m_db);
+    q.prepare(QString("SELECT %1 FROM %2 WHERE id=:id")
+                  .arg(m_fields.join(", "), m_table));
+    q.bindValue(":id", id);
+
+    if (q.exec() && q.next()) {
+        for (int i=0; i<m_fields.size(); ++i)
+            r[m_fields[i]] = q.value(i);
+    }
+    return r;
+}
+
+QVariantList BaseRepository::getAll() {
+    QVariantList out;
+    if (!m_db.isValid() || !m_db.isOpen()) return out;
+
+    QSqlQuery q(m_db);
+    if (q.exec(QString("SELECT %1 FROM %2 ORDER BY id ASC")
+                   .arg(m_fields.join(", "), m_table))) {
+        while (q.next()) {
+            QVariantMap item;
+            for (int i=0; i<m_fields.size(); ++i)
+                item[m_fields[i]] = q.value(i);
+            out.append(item);
+        }
+    }
+    return out;
+}
+
+bool BaseRepository::update(int id, const QVariantMap &values) {
+    if (!m_db.isValid() || !m_db.isOpen()) return false;
+
+    QStringList sets;
+    for (auto it = values.begin(); it != values.end(); ++it)
+        sets << QString("%1=:%1").arg(it.key());
+
+    QSqlQuery q(m_db);
+    q.prepare(QString("UPDATE %1 SET %2 WHERE id=:id")
+                  .arg(m_table, sets.join(", ")));
+
+    for (auto it = values.begin(); it != values.end(); ++it)
+        q.bindValue(":" + it.key(), it.value());
+    q.bindValue(":id", id);
+
+    return q.exec();
+}
+
+bool BaseRepository::insertWithKeys(const QString &tableName,
+                                    const QVariantMap &values) {
+    QStringList columns = values.keys();
+    QStringList placeholders;
+    for (const auto &col : std::as_const(columns)) {
+        placeholders << ":" + col;
+    }
+
+    QString sql = QString("INSERT INTO %1 (%2) VALUES (%3)")
+                      .arg(tableName, columns.join(", "), placeholders.join(", "));
+
+    QSqlQuery query(m_db);
+    query.prepare(sql);
+    for (const auto &col : std::as_const(columns)) {
+        query.bindValue(":" + col, values.value(col));
+    }
+    return query.exec();
+}
+
+int BaseRepository::getIdByField(const QString &tableName,
+                                const QString &name) {
+    QSqlQuery query(m_db);
+    query.prepare(QString("SELECT id FROM %1 WHERE name = :name LIMIT 1")
+                      .arg(tableName));
+    query.bindValue(":name", name);
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt();
+    }
+    return -1;
+}
+
+bool BaseRepository::deleteById(int id) {
+    if (!m_db.isValid() || !m_db.isOpen()) return false;
+    QSqlQuery q(m_db);
+    q.prepare(QString("DELETE FROM %1 WHERE id=:id").arg(m_table));
+    q.bindValue(":id", id);
+    return q.exec();
+}
+
+QVariantMap BaseRepository::getByField(const QString &fieldName, const QVariant &value)
+{
+    QVariantMap result;
+    if (!m_db.isValid() || !m_db.isOpen()) {
+        qWarning() << "[BaseRepository] Database is not open or invalid";
+        return result;
+    }
+
+    // Формируем SQL-запрос
+    QString sql = QString("SELECT %1 FROM %2 WHERE %3 = :val LIMIT 1")
+                      .arg(m_fields.join(", "))
+                      .arg(m_table)
+                      .arg(fieldName);
+
+    QSqlQuery query(m_db);
+    query.prepare(sql);
+    query.bindValue(":val", value);
+
+    if (!query.exec()) {
+        qWarning() << "[BaseRepository] getByField failed:" << query.lastError().text();
+        return result;
+    }
+
+    if (query.next()) {
+        for (int i = 0; i < m_fields.size(); ++i) {
+            result[m_fields[i]] = query.value(i);
+        }
+    }
+
+    return result;
+}
+
+bool BaseRepository::createOrUpdate(int id, const QVariantMap &values) {
+    if (!m_db.isValid() || !m_db.isOpen()) return false;
+
+    if (update(id, values)) {
+        QSqlQuery check(m_db);
+        check.exec("SELECT changes()");
+        if (check.next() && check.value(0).toInt() > 0)
+            return true;
+    }
+
+    QVariantMap vals = values;
+    vals["id"] = id;
+    return create(vals) != -1;
+}
+
+
+--- .\repos\BaseRepository.h ---
+#pragma once
+#include <QObject>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QVariantMap>
+#include <QVariantList>
+#include <QDebug>
+
+class BaseRepository : public QObject {
+    Q_OBJECT
+protected:
+    QSqlDatabase m_db;
+    QString m_table;
+    QStringList m_fields;
+
+public:
+    explicit BaseRepository(const QString &table,
+                            const QStringList &fields,
+                            QObject *parent=nullptr)
+        : QObject(parent), m_table(table), m_fields(fields) {
+        qDebug()<<m_table;
+        qDebug()<<m_fields;}
+
+    void setDatabase(const QSqlDatabase &db) { m_db = db; }
+
+    // CREATE
+    int create(const QVariantMap &values);
+
+    // READ
+    QVariantMap getById(int id);
+    QVariantList getAll();
+
+    // UPDATE
+    bool update(int id, const QVariantMap &values);
+
+    // DELETE
+    bool deleteById(int id);
+
+    // UPSERT
+    bool createOrUpdate(int id, const QVariantMap &values);
+    // вставка по ключам
+    bool insertWithKeys(const QString &tableName,
+                        const QVariantMap &values);
+    //int BaseRepository::getIdByName(const QString &tableName, const QString &name)
+    // метод для получения данных по имени
+    int getIdByField(const QString &tableName,
+                    const QString &name);
+    //для получения
+    QVariantMap getByField(const QString &fieldName, const QVariant &value);
+
+};
+
+
+--- .\repos\consumedrepository.cpp ---
+#include "consumedrepository.h"
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QDebug>
+#include <QDateTime>
+
+ConsumedRepository::ConsumedRepository(QObject *parent)
+    : BaseRepository("consumed_entries",
+                     {"id","user_id","date","product_name","quantity","unit",
+                      "proteins","fats","carbs","calories","timestamp"},
+                     parent) {}
+
+int ConsumedRepository::createConsumedEntry(QVariantMap values) {
+
+    //values["user_id"] = userId;
+    values["date"] =  QDate::currentDate().toString("yyyy-MM-dd");
+    //values["product_name"] = productName;
+    //values["quantity"] = quantity;
+    //values["unit"] = unit;
+   // values["proteins"] = proteins;
+   // values["fats"] = fats;
+    //values["carbs"] = carbs;
+    //values["calories"] = calories;
+    values["timestamp"] =QTime::currentTime().toString("hh-mm-ss");
+   // qDebug()<<"consumed entry data:";
+   // qDebug()<<values;
+    return create(values);
+}
+
+QVariantList ConsumedRepository::getConsumedEntriesByUser(int userId, const QString &date) {
+    QVariantList out;
+    if (!m_db.isValid() || !m_db.isOpen()) return out;
+
+    QSqlQuery q(m_db);
+    q.prepare("SELECT id, user_id, date, product_name, quantity, unit, proteins, fats, carbs, calories, timestamp "
+              "FROM consumed_entries WHERE user_id = :uid AND date = :dt ORDER BY id ASC");
+    q.bindValue(":uid", userId);
+    q.bindValue(":dt", date);
+
+    if (q.exec()) {
+        while (q.next()) {
+            QVariantMap item;
+            item["id"] = q.value(0);
+            item["user_id"] = q.value(1);
+            item["date"] = q.value(2);
+            item["product_name"] = q.value(3);
+            item["quantity"] = q.value(4);
+            item["unit"] = q.value(5);
+            item["proteins"] = q.value(6);
+            item["fats"] = q.value(7);
+            item["carbs"] = q.value(8);
+            item["calories"] = q.value(9);
+            item["timestamp"] = q.value(10);
+            out.append(item);
+        }
+    }
+    return out;
+}
+
+
+--- .\repos\consumedrepository.h ---
+#pragma once
+#include "BaseRepository.h"
+
+class ConsumedRepository : public BaseRepository {
+    Q_OBJECT
+public:
+    explicit ConsumedRepository(QObject *parent = nullptr);
+
+    // Специфичные методы
+    int createConsumedEntry(QVariantMap values);
+
+    QVariantList getConsumedEntriesByUser(int userId, const QString &date);
+};
+
+
+--- .\repos\dailystatisticsrepository.cpp ---
+#include "dailystatisticsrepository.h"
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QDebug>
+
+DailyStatisticsRepository::DailyStatisticsRepository(QObject *parent)
+    : BaseRepository("daily_statistics",
+                     {"id","user_id","date","water_ml","total_proteins","total_fats","total_carbs","total_calories"},
+                     parent) {}
+
+bool DailyStatisticsRepository::createOrUpdateDailyStatistics(int userId, QVariantMap values) {
+
+    values["user_id"] = userId;
+    /*values["date"] = date;
+    values["water_ml"] = waterMl;
+    values["total_proteins"] = totalProteins;
+    values["total_fats"] = totalFats;
+    values["total_carbs"] = totalCarbs;
+    values["total_calories"] = totalCalories;*/
+    return createOrUpdate(userId, values);
+}
+
+QVariantMap DailyStatisticsRepository::getDailyStatisticsRecord(int userId, const QString &date) {
+    QVariantMap r;
+    if (!m_db.isValid() || !m_db.isOpen()) return r;
+
+    QSqlQuery q(m_db);
+    q.prepare("SELECT water_ml, total_proteins, total_fats, total_carbs, total_calories "
+              "FROM daily_statistics WHERE user_id=:uid AND date=:date");
+    q.bindValue(":uid", userId);
+    q.bindValue(":date", date);
+
+    if (q.exec() && q.next()) {
+        r["waterMl"]   = q.value(0).toDouble();
+        r["proteins"]  = q.value(1).toDouble();
+        r["fats"]      = q.value(2).toDouble();
+        r["carbs"]     = q.value(3).toDouble();
+        r["calories"]  = q.value(4).toDouble();
+        r["date"]      = date;
+    }
+    return r;
+}
+
+QVariantList DailyStatisticsRepository::getDailyStatisticsRange(int userId, const QString &startDate, const QString &endDate) {
+    QVariantList out;
+    if (!m_db.isValid() || !m_db.isOpen()) return out;
+
+    QSqlQuery q(m_db);
+    q.prepare("SELECT date, water_ml, total_proteins, total_fats, total_carbs, total_calories "
+              "FROM daily_statistics WHERE user_id=:uid AND date BETWEEN :start AND :end ORDER BY date ASC");
+    q.bindValue(":uid", userId);
+    q.bindValue(":start", startDate);
+    q.bindValue(":end", endDate);
+
+    if (q.exec()) {
+        while (q.next()) {
+            QVariantMap item;
+            item["date"]      = q.value(0);
+            item["waterMl"]   = q.value(1).toDouble();
+            item["proteins"]  = q.value(2).toDouble();
+            item["fats"]      = q.value(3).toDouble();
+            item["carbs"]     = q.value(4).toDouble();
+            item["calories"]  = q.value(5).toDouble();
+            out.append(item);
+        }
+    }
+    return out;
+}
+
+
+--- .\repos\dailystatisticsrepository.h ---
+#pragma once
+#include "BaseRepository.h"
+
+class DailyStatisticsRepository : public BaseRepository {
+    Q_OBJECT
+public:
+    explicit DailyStatisticsRepository(QObject *parent = nullptr);
+
+    // Специфичные методы
+    bool createOrUpdateDailyStatistics(int userId, QVariantMap values);
+
+    QVariantMap getDailyStatisticsRecord(int userId, const QString &date);
+    QVariantList getDailyStatisticsRange(int userId, const QString &startDate, const QString &endDate);
+};
+
+
+--- .\repos\emotionsrepository.cpp ---
+#include "emotionsrepository.h"
+
+EmotionsRepository::EmotionsRepository(QObject *parent)
+    : BaseRepository("emotions", {"id","name","classification"}, parent) {}
+
+int EmotionsRepository::createEmotion(const QString &name, const QString &classification) {
+    QVariantMap values;
+    values["name"] = name;
+    values["classification"] = classification;
+    return create(values);
+}
+
+QVariantMap EmotionsRepository::getEmotionByName(const QString &name) {
+    return getByField("name", name);
+}
+
+
+--- .\repos\emotionsrepository.h ---
+#pragma once
+#include "BaseRepository.h"
+
+class EmotionsRepository : public BaseRepository {
+    Q_OBJECT
+public:
+    explicit EmotionsRepository(QObject *parent = nullptr);
+
+    // Специфичные методы
+    int createEmotion(const QString &name, const QString &classification);
+    QVariantMap getEmotionByName(const QString &name);
+};
+
+
+--- .\repos\exerciseentriesrepository.cpp ---
+#include "exerciseentriesrepository.h"
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QDebug>
+
+ExerciseEntriesRepository::ExerciseEntriesRepository(QObject *parent)
+    : BaseRepository("exercise_entries",
+                     {"id","user_id","date","exercise_name","duration_minutes","calories_burned","timestamp"},
+                     parent) {}
+
+int ExerciseEntriesRepository::createExerciseEntry(int userId, const QString &date,
+                                                   const QString &exerciseName,
+                                                   double duration, double caloriesBurned,
+                                                   const QString &timestamp) {
+    QVariantMap values;
+    values["user_id"] = userId;
+    values["date"] = date;
+    values["exercise_name"] = exerciseName;
+    values["duration_minutes"] = duration;
+    values["calories_burned"] = caloriesBurned;
+    values["timestamp"] = timestamp;
+    return create(values);
+}
+
+QVariantList ExerciseEntriesRepository::getExerciseEntriesByUser(int userId, const QString &date) {
+    QVariantList out;
+    if (!m_db.isValid() || !m_db.isOpen()) return out;
+
+    QSqlQuery q(m_db);
+    q.prepare("SELECT id, user_id, date, exercise_name, duration_minutes, calories_burned, timestamp "
+              "FROM exercise_entries WHERE user_id = :uid AND date = :dt ORDER BY id ASC");
+    q.bindValue(":uid", userId);
+    q.bindValue(":dt", date);
+
+    if (q.exec()) {
+        while (q.next()) {
+            QVariantMap item;
+            item["id"] = q.value(0);
+            item["user_id"] = q.value(1);
+            item["date"] = q.value(2);
+            item["exercise_name"] = q.value(3);
+            item["duration_minutes"] = q.value(4);
+            item["calories_burned"] = q.value(5);
+            item["timestamp"] = q.value(6);
+            out.append(item);
+        }
+    }
+    return out;
+}
+
+
+--- .\repos\exerciseentriesrepository.h ---
+#pragma once
+#include "BaseRepository.h"
+
+class ExerciseEntriesRepository : public BaseRepository {
+    Q_OBJECT
+public:
+    explicit ExerciseEntriesRepository(QObject *parent = nullptr);
+
+    // Специфичные методы
+    int createExerciseEntry(int userId, const QString &date, const QString &exerciseName,
+                            double duration, double caloriesBurned, const QString &timestamp);
+
+    QVariantList getExerciseEntriesByUser(int userId, const QString &date);
+};
+
+
+--- .\repos\productsrepository.cpp ---
+#include "productsrepository.h"
+ProductsRepository::ProductsRepository(QObject *parent)
+    : BaseRepository("products", {"id","name","quantity","unit","proteins","fats","carbs"}, parent) {}
+
+int ProductsRepository::createProduct(QVariantMap values) {
+  /*  QVariantMap values;
+    values["name"] = name;
+    values["quantity"] = quantity;
+    values["unit"] = unit;
+    values["proteins"] = proteins;
+    values["fats"] = fats;
+    values["carbs"] = carbs;
+*/
+return create(values);
+}
+
+QVariantMap ProductsRepository::getProduct(int id) { return getById(id); }
+QVariantList ProductsRepository::getAllProducts() { return getAll(); }
+
+bool ProductsRepository::updateProduct(int id, const QString &name, double quantity) {
+    QVariantMap values;
+    values["name"] = name;
+    values["quantity"] = quantity;
+    return update(id, values);
+}
+
+bool ProductsRepository::deleteProduct(int id) { return deleteById(id); }
+
+bool ProductsRepository::createOrUpdateProduct(int id,QVariantMap values) {
+  /*  QVariantMap values;
+    values["name"] = name;
+    values["quantity"] = quantity;
+    values["unit"] = unit;
+    values["proteins"] = proteins;
+    values["fats"] = fats;
+    values["carbs"] = carbs;*/
+    return createOrUpdate(id, values);
+}
+
+
+--- .\repos\productsrepository.h ---
+#pragma once
+#include "BaseRepository.h"
+
+class ProductsRepository : public BaseRepository {
+    Q_OBJECT
+public:
+    explicit ProductsRepository(QObject *parent = nullptr);
+
+    // Специфичные методы
+    QVariantMap getProductByName(const QString &name);
+    bool createOrUpdateProduct(int id,QVariantMap values);
+    int createProduct(QVariantMap value);
+    bool updateProduct(int id,const QString& value, double quantity);
+    QVariantMap getProduct(int id);
+    QVariantList getAllProducts();
+    bool deleteProduct(int id);
+};
+
+
+--- .\repos\recipeingredientsrepository.cpp ---
+#include "recipeingredientsrepository.h"
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QDebug>
+
+RecipeIngredientsRepository::RecipeIngredientsRepository(QObject *parent)
+    : BaseRepository("recipe_ingredients", {"id","recipe_id","product_id"}, parent) {}
+
+/*int RecipeIngredientsRepository::addProductToRecipe(int recipeId, int productId) {
+    QVariantMap values;
+    values["recipe_id"] = recipeId;
+    values["product_id"] = productId;
+    return create(values);
+}*/
+
+QVariantList RecipeIngredientsRepository::getProductsForRecipe(int recipeId) {
+    QVariantList out;
+    if (!m_db.isValid() || !m_db.isOpen()) return out;
+
+    QSqlQuery q(m_db);
+    q.prepare("SELECT product_id FROM recipe_ingredients WHERE recipe_id = :rid");
+    q.bindValue(":rid", recipeId);
+
+    if (q.exec()) {
+        while (q.next()) {
+            QVariantMap item;
+            item["product_id"] = q.value(0);
+            out.append(item);
+        }
+    }
+    return out;
+}
+
+bool RecipeIngredientsRepository::deleteAllForRecipe(int recipeId) {
+    if (!m_db.isValid() || !m_db.isOpen()) return false;
+    QSqlQuery q(m_db);
+    q.prepare("DELETE FROM recipe_ingredients WHERE recipe_id = :rid");
+    q.bindValue(":rid", recipeId);
+    return q.exec();
+}
+
+int RecipeIngredientsRepository::addProductToRecipe(int recipeId, int productId) {
+    // 1. Создаём связку
+    QVariantMap values;
+    values["recipe_id"] = recipeId;
+    values["product_id"] = productId;
+    int linkId = create(values);
+
+    if (linkId == -1) return -1;
+
+    // 2. Получаем продукт
+    ProductsRepository products;
+    products.setDatabase(m_db);
+    QVariantMap product = products.getById(productId);
+
+    // 3. Обновляем агрегаты рецепта
+    RecipesRepository recipes;
+    recipes.setDatabase(m_db);
+
+    QVariantMap recipe = recipes.getById(recipeId);
+    double proteins = recipe["proteins"].toDouble() + product["proteins"].toDouble();
+    double fats     = recipe["fats"].toDouble()     + product["fats"].toDouble();
+    double carbs    = recipe["carbs"].toDouble()    + product["carbs"].toDouble();
+    double calories = recipe["calories"].toDouble() +
+                      (product["proteins"].toDouble()*4 +
+                       product["fats"].toDouble()*9 +
+                       product["carbs"].toDouble()*4);
+
+    QVariantMap updateVals;
+    updateVals["proteins"] = proteins;
+    updateVals["fats"]     = fats;
+    updateVals["carbs"]    = carbs;
+    updateVals["calories"] = calories;
+
+    recipes.update(recipeId, updateVals);
+
+    return linkId;
+}
+
+bool RecipeIngredientsRepository::removeProductFromRecipe(int recipeId, int productId) {
+    // 1. Получаем продукт
+    ProductsRepository products;
+    products.setDatabase(m_db);
+    QVariantMap product = products.getById(productId);
+
+    // 2. Вычитаем из агрегатов рецепта
+    RecipesRepository recipes;
+    recipes.setDatabase(m_db);
+
+    QVariantMap recipe = recipes.getById(recipeId);
+    double proteins = recipe["proteins"].toDouble() - product["proteins"].toDouble();
+    double fats     = recipe["fats"].toDouble()     - product["fats"].toDouble();
+    double carbs    = recipe["carbs"].toDouble()    - product["carbs"].toDouble();
+    double calories = recipe["calories"].toDouble() -
+                      (product["proteins"].toDouble()*4 +
+                       product["fats"].toDouble()*9 +
+                       product["carbs"].toDouble()*4);
+
+    QVariantMap updateVals;
+    updateVals["proteins"] = proteins;
+    updateVals["fats"]     = fats;
+    updateVals["carbs"]    = carbs;
+    updateVals["calories"] = calories;
+
+    recipes.update(recipeId, updateVals);
+
+    // 3. Удаляем связку
+    QSqlQuery q(m_db);
+    q.prepare("DELETE FROM recipe_ingredients WHERE recipe_id=:rid AND product_id=:pid");
+    q.bindValue(":rid", recipeId);
+    q.bindValue(":pid", productId);
+    return q.exec();
+}
+
+
+
+--- .\repos\recipeingredientsrepository.h ---
+#pragma once
+#include "BaseRepository.h"
+#include "recipesrepository.h"
+#include "productsrepository.h"
+class RecipeIngredientsRepository : public BaseRepository {
+    Q_OBJECT
+public:
+    explicit RecipeIngredientsRepository(QObject *parent = nullptr);
+
+    // Добавить продукт в рецепт
+    int addProductToRecipe(int recipeId, int productId);
+
+    // Получить все продукты для рецепта
+    QVariantList getProductsForRecipe(int recipeId);
+
+    // Удалить все продукты для рецепта
+    bool deleteAllForRecipe(int recipeId);
+
+    bool removeProductFromRecipe(int recipeId, int productId);
+
+    //int addProductToRecipe(int recipeId, int productId);
+};
+
+
+--- .\repos\recipesrepository.cpp ---
+#include "recipesrepository.h"
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QDebug>
+
+RecipesRepository::RecipesRepository(QObject *parent)
+    : BaseRepository("recipes",
+                     {"id","name","quantity","unit","proteins","fats","carbs"},
+                     parent) {}
+
+int RecipesRepository::createRecipe(const QString &name, double quantity,
+                                    const QString &unit,
+                                    double proteins, double fats, double carbs) {
+    QVariantMap values;
+    values["name"] = name;
+    values["quantity"] = quantity;
+    values["unit"] = unit;
+    values["proteins"] = proteins;
+    values["fats"] = fats;
+    values["carbs"] = carbs;
+    return create(values);
+}
+
+QVariantMap RecipesRepository::getRecipeByName(const QString &name) {
+    return getByField("name", name);
+}
+
+bool RecipesRepository::deleteRecipeWithIngredients(int id) {
+    if (!m_db.isValid() || !m_db.isOpen()) return false;
+
+    // Сначала удаляем ингредиенты рецепта
+    QSqlQuery q(m_db);
+    q.prepare("DELETE FROM recipe_ingredients WHERE recipe_id = :rid");
+    q.bindValue(":rid", id);
+    if (!q.exec()) {
+        qWarning() << "deleteRecipeWithIngredients: failed to delete ingredients:"
+                   << q.lastError().text();
+        return false;
+    }
+
+    // Затем удаляем сам рецепт
+    return deleteById(id);
+}
+
+
+--- .\repos\recipesrepository.h ---
+#pragma once
+#include "BaseRepository.h"
+
+class RecipesRepository : public BaseRepository {
+    Q_OBJECT
+public:
+    explicit RecipesRepository(QObject *parent = nullptr);
+
+    // Специфичные методы
+    int createRecipe(const QString &name, double quantity, const QString &unit,
+                     double proteins, double fats, double carbs);
+
+    QVariantMap getRecipeByName(const QString &name);
+
+    // Удаление рецепта вместе с ингредиентами
+    bool deleteRecipeWithIngredients(int id);
+};
+
+
+--- .\repos\TODO.txt ---
+В общем за создание и изменение рецептов будет ответственнен клаа recipeingredientrepository
+, за поиск и хранение ответственнен класс reciperepository, что это значит, это значит:
+1. В случае создания рецепта сначала должны собраться участвующие ингридиенты в .qml,
+затем суммируются их БЖУ и калории, после чего в таблице recipe создается запись, потом 
+ ингридиенты связываются в таблице recipeingridients по вн. ключу recipe_id *, так же предлагаю убрать лишние поля, 
+относящиеся к БЖУ именно этой таблицы
+2.В для изменения  рецепта ( включая его количество и состав), нужно найти по имени имя рецепта либо id,:
+2.1 В случае удаления рецепта удалить все относящиеся к рецепту записи в снача этой таблице, затем удалить записи
+ в таблице recipes ;
+2.2 В случае изменения ингридиента recipes необходимо получить id или имя продукта, после чего в случае удаления продукта
+вычесть из рецепта БЖУ и каллории соответствующего продукта  , в случае добавления продукта суммировать.
+2.3 В случае изменения свойств БЖУ продукта, скорее всего пересчитать все БЖУ + калории рецепта
+
+
+
+
+
+
+*как я это вижу будет происходить:
+вот у нас есть салат цезарь, мы знаем что это рецепт и там используются следующие ингредиенты, в скобочках id:
+Салат(1), курица(2), помидор(3), майонез(4),гренки(5)
+теперь мы должны как то их связать , для этого считается БЖУ+ калории рецепта, вносится имя рецепта салат цезарь(1),
+теперь создается 5 записей в таблице recipeingredients(псевдокод):
+ВСТАВИТЬ(авто,1(салат цезарь),1(Салат)),
+ВСТАВИТЬ(авто,1(салат цезарь),2(Курица)),
+ВСТАВИТЬ(авто,1(салат цезарь),3(Помидор)),
+...
+
+
+
+--- .\repos\usersrepository.cpp ---
+#include "usersrepository.h"
+
+UsersRepository::UsersRepository(QObject *parent)
+    : BaseRepository("users", {"id","name","age","gender","height","weight","goal","activity_level"}, parent) {}
+
+int UsersRepository::createUser(const QString &name, int age, const QString &gender,
+                                double height, double weight, const QString &goal, int activityLevel) {
+    QVariantMap values;
+    values["name"] = name;
+    values["age"] = age;
+    values["gender"] = gender;
+    values["height"] = height;
+    values["weight"] = weight;
+    values["goal"] = goal;
+    values["activity_level"] = activityLevel;
+    return create(values);
+}
+
+QVariantMap UsersRepository::getUser(int id) { return getById(id); }
+QVariantList UsersRepository::getAllUsers() { return getAll(); }
+
+bool UsersRepository::updateUser(int id, const QString &name, double weight) {
+    QVariantMap values;
+    values["name"] = name;
+    values["weight"] = weight;
+    return update(id, values);
+}
+
+bool UsersRepository::deleteUser(int id) { return deleteById(id); }
+
+bool UsersRepository::createOrUpdateUser(int id, const QString &name, int age, const QString &gender,
+                                         double height, double weight, const QString &goal, int activityLevel) {
+    QVariantMap values;
+    values["name"] = name;
+    values["age"] = age;
+    values["gender"] = gender;
+    values["height"] = height;
+    values["weight"] = weight;
+    values["goal"] = goal;
+    values["activity_level"] = activityLevel;
+    return createOrUpdate(id, values);
+}
+
+
+--- .\repos\usersrepository.h ---
+#pragma once
+#include "BaseRepository.h"
+
+class UsersRepository : public BaseRepository {
+    Q_OBJECT
+public:
+    explicit UsersRepository(QObject *parent=nullptr);
+
+    int createUser(const QString &name, int age, const QString &gender,
+                   double height, double weight, const QString &goal, int activityLevel);
+    QVariantMap getUser(int id);
+    QVariantList getAllUsers();
+    bool updateUser(int id, const QString &name, double weight);
+    bool deleteUser(int id);
+    bool createOrUpdateUser(int id, const QString &name, int age, const QString &gender,
+                            double height, double weight, const QString &goal, int activityLevel);
+};
+
+
+--- .\services\acheivmentsservice.cpp ---
+#include "acheivmentsservice.h"
+
+AchievementsService::AchievementsService(const QSqlDatabase& db, QObject* parent)
+    : BaseService(db, parent), m_repo(new AchievementsRepository(this)) {
+    m_repo->setDatabase(db);
+}
+
+QVariantMap AchievementsService::addAchievement(const QString& name, const QString& description, bool unlocked) {
+    int id = m_repo->createAchievement(name, description, unlocked);
+    QVariantMap payload;
+    payload["id"] = id;
+    payload["name"] = name;
+    return makeResponse(id != -1, id != -1 ? "Достижение добавлено" : "Ошибка добавления", payload);
+}
+
+QVariantList AchievementsService::getAllAchievements() {
+    return m_repo->getAllAchievements();
+}
+
+
+--- .\services\acheivmentsservice.h ---
+#pragma once
+#include "BaseService.h"
+#include "repos/achievementsrepository.h"
+
+class AchievementsService : public BaseService {
+    Q_OBJECT
+public:
+    explicit AchievementsService(const QSqlDatabase& db, QObject* parent = nullptr);
+
+    Q_INVOKABLE QVariantMap addAchievement(const QString& name, const QString& description, bool unlocked);
+
+    Q_INVOKABLE QVariantList getAllAchievements();
+
+private:
+    AchievementsRepository* m_repo;
+};
+
+
+--- .\services\BaseService.cpp ---
+#include "BaseService.h"
+#include <QDebug>
+
+BaseService::BaseService(const QSqlDatabase& db, QObject* parent)
+    : QObject(parent), m_db(db) {}
+
+bool BaseService::beginTransaction() {
+    if (!m_db.isOpen()) {
+        qWarning() << "[BaseService] Database is not open!";
+        return false;
+    }
+    return m_db.transaction();
+}
+
+bool BaseService::commitTransaction() {
+    return m_db.commit();
+}
+
+bool BaseService::rollbackTransaction() {
+    return m_db.rollback();
+}
+
+void BaseService::logInfo(const QString& msg) {
+    qDebug() << "[Service]" << msg;
+}
+
+void BaseService::logError(const QString& msg) {
+    qWarning() << "[Service ERROR]" << msg;
+}
+
+QVariantMap BaseService::makeResponse(bool success,
+                                      const QString& message,
+                                      const QVariantMap& payload) {
+    QVariantMap response;
+    response["success"] = success;
+    response["message"] = message;
+    response["data"]    = payload;
+    return response;
+}
+
+
+--- .\services\BaseService.h ---
+#pragma once
+#include <QObject>
+#include <QSqlDatabase>
+#include <QVariantMap>
+#include <QString>
+
+class BaseService : public QObject {
+    Q_OBJECT
+protected:
+    QSqlDatabase m_db;
+
+public:
+    explicit BaseService(const QSqlDatabase& db, QObject* parent = nullptr);
+
+    // Транзакции
+    Q_INVOKABLE bool beginTransaction();
+    Q_INVOKABLE bool commitTransaction();
+    Q_INVOKABLE bool rollbackTransaction();
+
+    // Логирование
+    Q_INVOKABLE void logInfo(const QString& msg);
+    Q_INVOKABLE void logError(const QString& msg);
+
+    // Унифицированный ответ для QML
+    Q_INVOKABLE QVariantMap makeResponse(bool success,
+                                         const QString& message,
+                                         const QVariantMap& payload = {});
+};
+
+
+--- .\services\consumedservice.cpp ---
+#include "consumedservice.h"
+
+ConsumedService::ConsumedService(const QSqlDatabase& db, QObject* parent)
+    : BaseService(db, parent),
+    m_consumed(new ConsumedRepository(this)),
+    m_stats(new DailyStatisticsRepository(this)) {
+    m_consumed->setDatabase(db);
+    m_stats->setDatabase(db);
+}
+
+QVariantMap ConsumedService::addConsumedEntry(QVariantMap values) {
+    if (!beginTransaction()) return makeResponse(false, "Ошибка транзакции");
+
+    int id = m_consumed->createConsumedEntry(values);
+    if (id == -1) {
+        rollbackTransaction();
+        return makeResponse(false, "Не удалось создать запись");
+    }
+
+    // Получаем текущую статистику
+    QVariantMap stats = m_stats->getDailyStatisticsRecord(values["userId"].toInt(), values["date"].toString());
+    double newProteins = stats["proteins"].toDouble() + values["proteins"].toDouble();
+    double newFats     = stats["fats"].toDouble() + values["fats"].toDouble();
+    double newCarbs    = stats["carbs"].toDouble() + values["carbs"].toDouble();
+    double newCalories = stats["calories"].toDouble() + values["calories"].toDouble();
+
+    bool ok = m_stats->createOrUpdateDailyStatistics(values["userId"].toInt(), stats);
+    if (!ok) {
+        rollbackTransaction();
+        return makeResponse(false, "Не удалось обновить статистику");
+    }
+
+    commitTransaction();
+
+    QVariantMap payload;
+    payload["id"] = id;
+    payload["date"] = values["date"].toString();
+    payload["calories"] = newCalories;
+    payload["proteins"] = newProteins;
+    payload["fats"] = newFats;
+    payload["carbs"] = newCarbs;
+
+    return makeResponse(true, "Запись добавлена", payload);
+}
+
+
+--- .\services\consumedservice.h ---
+#pragma once
+#include "BaseService.h"
+#include "repos/consumedrepository.h"
+#include "repos/dailystatisticsrepository.h"
+
+class ConsumedService : public BaseService {
+    Q_OBJECT
+public:
+    explicit ConsumedService(const QSqlDatabase& db, QObject* parent = nullptr);
+
+    // Добавить запись о потреблении продукта и обновить статистику
+    Q_INVOKABLE QVariantMap addConsumedEntry(QVariantMap values);
+
+private:
+    ConsumedRepository* m_consumed;
+    DailyStatisticsRepository* m_stats;
+};
+
+
+--- .\services\dailystatisticsservice.cpp ---
+#include "dailystatisticsservice.h"
+
+DailyStatisticsService::DailyStatisticsService(const QSqlDatabase& db, QObject* parent)
+    : BaseService(db, parent), m_repo(new DailyStatisticsRepository(this)) {
+    m_repo->setDatabase(db);
+}
+
+QVariantMap DailyStatisticsService::getDailyStatistics(int userId, const QString& date) {
+    QVariantMap stats = m_repo->getDailyStatisticsRecord(userId, date);
+    return makeResponse(!stats.isEmpty(), stats.isEmpty() ? "Нет данных" : "ОК", stats);
+}
+
+
+--- .\services\dailystatisticsservice.h ---
+#pragma once
+#include "BaseService.h"
+#include "repos/dailystatisticsrepository.h"
+
+class DailyStatisticsService : public BaseService {
+    Q_OBJECT
+public:
+    explicit DailyStatisticsService(const QSqlDatabase& db, QObject* parent = nullptr);
+
+    Q_INVOKABLE QVariantMap getDailyStatistics(int userId, const QString& date);
+
+private:
+    DailyStatisticsRepository* m_repo;
+};
+
+
+--- .\services\emotionsservice.cpp ---
+#include "EmotionsService.h"
+
+EmotionsService::EmotionsService(const QSqlDatabase& db, QObject* parent)
+    : BaseService(db, parent), m_repo(new EmotionsRepository(this)) {
+    m_repo->setDatabase(db);
+}
+
+QVariantMap EmotionsService::addEmotion(const QString& name, const QString& classification) {
+    int id = m_repo->createEmotion(name, classification);
+    QVariantMap payload;
+    payload["id"] = id;
+    payload["name"] = name;
+    return makeResponse(id != -1, id != -1 ? "Эмоция добавлена" : "Ошибка добавления", payload);
+}
+
+QVariantMap EmotionsService::getEmotionByName(const QString& name) {
+    QVariantMap emotion = m_repo->getEmotionByName(name);
+    return makeResponse(!emotion.isEmpty(), emotion.isEmpty() ? "Не найдена" : "ОК", emotion);
+}
+
+
+--- .\services\emotionsservice.h ---
+#pragma once
+#include "BaseService.h"
+#include "repos/emotionsrepository.h"
+
+class EmotionsService : public BaseService {
+    Q_OBJECT
+public:
+    explicit EmotionsService(const QSqlDatabase& db, QObject* parent = nullptr);
+
+    Q_INVOKABLE QVariantMap addEmotion(const QString& name, const QString& classification);
+
+    Q_INVOKABLE QVariantMap getEmotionByName(const QString& name);
+
+private:
+    EmotionsRepository* m_repo;
+};
+
+
+--- .\services\exerciseservice.cpp ---
+#include "exerciseservice.h"
+
+ExerciseService::ExerciseService(const QSqlDatabase& db, QObject* parent)
+    : BaseService(db, parent),
+    m_exercises(new ExerciseEntriesRepository(this)),
+    m_stats(new DailyStatisticsRepository(this)) {
+    m_exercises->setDatabase(db);
+    m_stats->setDatabase(db);
+}
+
+QVariantMap ExerciseService::addExerciseEntry(int userId, const QString& date,
+                                              const QString& exerciseName,
+                                              double duration, double caloriesBurned,
+                                              const QString& timestamp) {
+    if (!beginTransaction()) return makeResponse(false, "Ошибка транзакции");
+
+    int id = m_exercises->createExerciseEntry(userId, date, exerciseName,
+                                              duration, caloriesBurned, timestamp);
+    if (id == -1) {
+        rollbackTransaction();
+        return makeResponse(false, "Не удалось создать запись упражнения");
+    }
+
+    // Обновляем статистику (например, калории)
+    QVariantMap stats = m_stats->getDailyStatisticsRecord(userId, date);
+    double newCalories = stats["calories"].toDouble() - caloriesBurned; // вычитаем сожжённые калории
+
+    bool ok = m_stats->createOrUpdateDailyStatistics(userId,
+                                                     stats);
+    if (!ok) {
+        rollbackTransaction();
+        return makeResponse(false, "Не удалось обновить статистику");
+    }
+
+    commitTransaction();
+
+    QVariantMap payload;
+    payload["id"] = id;
+    payload["exerciseName"] = exerciseName;
+    payload["caloriesBurned"] = caloriesBurned;
+    payload["date"] = date;
+    payload["caloriesAfterExercise"] = newCalories;
+
+    return makeResponse(true, "Упражнение добавлено", payload);
+}
+
+
+--- .\services\exerciseservice.h ---
+#pragma once
+#include "BaseService.h"
+#include "repos/exerciseentriesrepository.h"
+#include "repos/dailystatisticsrepository.h"
+
+class ExerciseService : public BaseService {
+    Q_OBJECT
+public:
+    explicit ExerciseService(const QSqlDatabase& db, QObject* parent = nullptr);
+
+    // Добавить запись об упражнении
+    Q_INVOKABLE QVariantMap addExerciseEntry(int userId, const QString& date,
+                                             const QString& exerciseName,
+                                             double duration, double caloriesBurned,
+                                             const QString& timestamp);
+
+private:
+    ExerciseEntriesRepository* m_exercises;
+    DailyStatisticsRepository* m_stats;
+};
+
+
+--- .\services\processjsonresponse.cpp ---
+#include "processjsonresponse.h"
+#include <QDebug>
+
+ProcessJsonResponse::ProcessJsonResponse(QObject* parent) : QObject(parent) {}
+
+bool ProcessJsonResponse::process(const QString& json,
+                                  int userId,
+                                  ConsumedRepository& consumedRepo,
+                                  EmotionsRepository& emotionsRepo,
+                                  ExerciseEntriesRepository& exercisesRepo,
+                                  DailyStatisticsRepository& statsRepo,
+                                  ProductsRepository& productsRepo,
+                                  RecipesRepository& recipesRepo,
+                                  RecipeIngredientsRepository& recipeIngredientsRepo,
+                                  AchievementsRepository& achievementsRepo,
+                                  UsersRepository& usersRepo)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8());
+    if (!doc.isObject()) {
+        emit errorOccurred(QStringLiteral("Invalid JSON"));
+        emit processed(false, QStringLiteral("Invalid JSON"));
+        return false;
+    }
+
+    const QJsonObject root = doc.object();
+    const QString day = todayISO();
+    const QString ts = nowISO();
+
+    // emotions
+    if (root.contains("emotions") && root["emotions"].isArray())
+        handleEmotions(root["emotions"].toArray(), emotionsRepo);
+
+    // consumed
+    if (root.contains("consumed") && root["consumed"].isArray())
+        handleConsumed(root["consumed"].toArray(), userId, day, ts, consumedRepo);
+
+    // exercises
+    if (root.contains("exercises") && root["exercises"].isArray())
+        handleExercises(root["exercises"].toArray(), userId, day, ts, exercisesRepo);
+
+    // products (optional block)
+    if (root.contains("products") && root["products"].isArray())
+        handleProducts(root["products"].toArray(), productsRepo);
+
+    // users (optional block)
+    if (root.contains("users") && root["users"].isArray())
+        handleUsers(root["users"].toArray(), usersRepo);
+
+    // achievements (optional block)
+    if (root.contains("achievements") && root["achievements"].isArray())
+        handleAchievements(root["achievements"].toArray(), achievementsRepo);
+
+    // recipes with ingredients (optional)
+    if (root.contains("recipes") && root["recipes"].isArray())
+        handleRecipes(root["recipes"].toArray(), recipesRepo, recipeIngredientsRepo);
+
+    // water/statistics
+    const double waterMl = root["waterMl"].toDouble();
+    updateDailyStats(userId, day, waterMl, consumedRepo, statsRepo);
+
+    emit processed(true, QStringLiteral("JSON processed successfully"));
+    return true;
+}
+
+void ProcessJsonResponse::handleEmotions(const QJsonArray& arr, EmotionsRepository& emotionsRepo)
+{
+    for (const QJsonValue& v : arr) {
+        const QJsonObject o = v.toObject();
+        if (o.isEmpty() || !hasKeys(o, {"name", "classification"})) {
+            qWarning() << "Skipping invalid emotion entry:" << o;
+            continue;
+        }
+        emotionsRepo.createEmotion(o["name"].toString(), o["classification"].toString());
+    }
+}
+
+void ProcessJsonResponse::handleConsumed(const QJsonArray& arr, int userId, const QString& dayISO, const QString& tsISO,
+                                         ConsumedRepository& consumedRepo)
+{
+    for (const QJsonValue& v : arr) {
+        const QJsonObject o = v.toObject();
+        if (o.isEmpty() || !hasKeys(o, {"name", "quantity", "unit"})) {
+            qWarning() << "Skipping invalid consumed entry:" << o;
+            continue;
+        }
+        /*consumedRepo.createConsumedEntry(userId, dayISO,
+                                         o["name"].toString(),
+                                         o["quantity"].toDouble(),
+                                         o["unit"].toString(),
+                                         o["proteins"].toDouble(),
+                                         o["fats"].toDouble(),
+                                         o["carbs"].toDouble(),
+                                         o["calories"].toDouble(),
+                                         tsISO);*/
+    }
+}
+
+void ProcessJsonResponse::handleExercises(const QJsonArray& arr, int userId, const QString& dayISO, const QString& tsISO,
+                                          ExerciseEntriesRepository& exercisesRepo)
+{
+    for (const QJsonValue& v : arr) {
+        const QJsonObject o = v.toObject();
+        if (o.isEmpty() || !hasKeys(o, {"name", "duration", "caloriesBurned"})) {
+            qWarning() << "Skipping invalid exercise entry:" << o;
+            continue;
+        }
+        exercisesRepo.createExerciseEntry(userId, dayISO,
+                                          o["name"].toString(),
+                                          o["duration"].toDouble(),
+                                          o["caloriesBurned"].toDouble(),
+                                          tsISO);
+    }
+}
+
+void ProcessJsonResponse::handleProducts(const QJsonArray& arr, ProductsRepository& productsRepo)
+{
+    for (const QJsonValue& v : arr) {
+        const QJsonObject o = v.toObject();
+        if (o.isEmpty() || !hasKeys(o, {"name", "quantity", "unit"})) {
+            qWarning() << "Skipping invalid product entry:" << o;
+            continue;
+        }
+        productsRepo.createProduct( o.toVariantMap());
+    }
+}
+
+void ProcessJsonResponse::handleUsers(const QJsonArray& arr, UsersRepository& usersRepo)
+{
+    for (const QJsonValue& v : arr) {
+        const QJsonObject o = v.toObject();
+        if (o.isEmpty() || !hasKeys(o, {"name"})) {
+            qWarning() << "Skipping invalid user entry:" << o;
+            continue;
+        }
+        usersRepo.createUser(o["name"].toString(),
+                             o["age"].toInt(),
+                             o["gender"].toString(),
+                             o["height"].toDouble(),
+                             o["weight"].toDouble(),
+                             o["goal"].toString(),
+                             o["activity_level"].toInt());
+    }
+}
+
+void ProcessJsonResponse::handleAchievements(const QJsonArray& arr, AchievementsRepository& achievementsRepo)
+{
+    for (const QJsonValue& v : arr) {
+        const QJsonObject o = v.toObject();
+        if (o.isEmpty() || !hasKeys(o, {"name"})) {
+            qWarning() << "Skipping invalid achievement entry:" << o;
+            continue;
+        }
+        achievementsRepo.createAchievement(o["name"].toString(),
+                                           o["description"].toString(),
+                                           o["unlocked"].toBool());
+    }
+}
+
+void ProcessJsonResponse::handleRecipes(const QJsonArray& arr, RecipesRepository& recipesRepo, RecipeIngredientsRepository& ingredientsRepo)
+{
+    for (const QJsonValue& v : arr) {
+        const QJsonObject o = v.toObject();
+        if (o.isEmpty() || !hasKeys(o, {"name"})) {
+            qWarning() << "Skipping invalid recipe entry:" << o;
+            continue;
+        }
+
+        int rid = recipesRepo.createRecipe(o["name"].toString(),
+                                           o["quantity"].toDouble(),
+                                           o["unit"].toString(),
+                                           o["proteins"].toDouble(),
+                                           o["fats"].toDouble(),
+                                           o["carbs"].toDouble());
+
+        const QJsonArray ings = o["ingredients"].toArray();
+        for (const QJsonValue& iv : ings) {
+            const QJsonObject io = iv.toObject();
+            if (io.isEmpty() || !hasKeys(io, {"name"})) {
+                qWarning() << "Skipping invalid ingredient entry:" << io;
+                continue;
+            }
+            ingredientsRepo.createOrUpdate(rid,io.toVariantMap());
+        }
+    }
+}
+
+bool ProcessJsonResponse::hasKeys(const QJsonObject& o, std::initializer_list<const char*> keys)
+{
+    for (const char* k : keys) {
+        if (!o.contains(QLatin1String(k))) return false;
+    }
+    return true;
+}
+
+QString ProcessJsonResponse::todayISO()
+{
+    return QDate::currentDate().toString("yyyy-MM-dd");
+}
+
+QString ProcessJsonResponse::nowISO()
+{
+    return QDateTime::currentDateTime().toString(Qt::ISODate);
+}
+
+void ProcessJsonResponse::updateDailyStats(int userId, const QString& dayISO, double waterMl,
+                                           ConsumedRepository& consumedRepo, DailyStatisticsRepository& statsRepo)
+{
+    double totalProteins = 0.0, totalFats = 0.0, totalCarbs = 0.0, totalCalories = 0.0;
+    const QVariantList items = consumedRepo.getConsumedEntriesByUser(userId, dayISO);
+    for (const QVariant& v : items) {
+        const QVariantMap m = v.toMap();
+        totalProteins += m.value("proteins").toDouble();
+        totalFats     += m.value("fats").toDouble();
+        totalCarbs    += m.value("carbs").toDouble();
+        totalCalories += m.value("calories").toDouble();
+    }
+   /* statsRepo.createOrUpdateDailyStatistics(userId, dayISO, waterMl,
+                                            totalProteins, totalFats, totalCarbs, totalCalories);*/
+}
+
+
+
+--- .\services\processjsonresponse.h ---
+#pragma once
+#include <QObject>
+#include <QString>
+#include <QVariantList>
+#include <QVariantMap>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QDate>
+#include <QDateTime>
+
+#include "repos/consumedrepository.h"
+#include "repos/emotionsrepository.h"
+#include "repos/exerciseentriesrepository.h"
+#include "repos/dailystatisticsrepository.h"
+#include "repos/achievementsrepository.h"
+#include "repos/usersrepository.h"
+#include "repos/productsrepository.h"
+#include "repos/recipesrepository.h"
+#include "repos/recipeingredientsrepository.h"
+
+class ProcessJsonResponse : public QObject
+{
+    Q_OBJECT
+public:
+    explicit ProcessJsonResponse(QObject* parent = nullptr);
+
+    // Entry point: process full JSON payload
+    bool process(const QString& json,
+                 int userId,
+                 ConsumedRepository& consumedRepo,
+                 EmotionsRepository& emotionsRepo,
+                 ExerciseEntriesRepository& exercisesRepo,
+                 DailyStatisticsRepository& statsRepo,
+                 ProductsRepository& productsRepo,
+                 RecipesRepository& recipesRepo,
+                 RecipeIngredientsRepository& recipeIngredientsRepo,
+                 AchievementsRepository& achievementsRepo,
+                 UsersRepository& usersRepo);
+
+signals:
+    void processed(bool success, const QString& message);
+    void errorOccurred(const QString& message);
+
+private:
+    // per-block handlers
+    void handleEmotions(const QJsonArray& arr, EmotionsRepository& emotionsRepo);
+    void handleConsumed(const QJsonArray& arr, int userId, const QString& dayISO, const QString& tsISO,
+                        ConsumedRepository& consumedRepo);
+    void handleExercises(const QJsonArray& arr, int userId, const QString& dayISO, const QString& tsISO,
+                         ExerciseEntriesRepository& exercisesRepo);
+    void handleProducts(const QJsonArray& arr, ProductsRepository& productsRepo);
+    void handleUsers(const QJsonArray& arr, UsersRepository& usersRepo);
+    void handleAchievements(const QJsonArray& arr, AchievementsRepository& achievementsRepo);
+    void handleRecipes(const QJsonArray& arr, RecipesRepository& recipesRepo, RecipeIngredientsRepository& ingredientsRepo);
+
+    // helpers
+    static bool hasKeys(const QJsonObject& o, std::initializer_list<const char*> keys);
+    static QString todayISO();
+    static QString nowISO();
+
+    // statistics accumulation
+    void updateDailyStats(int userId, const QString& dayISO, double waterMl,
+                          ConsumedRepository& consumedRepo, DailyStatisticsRepository& statsRepo);
+};
+
+
+
+--- .\services\productservice.cpp ---
+#include "productservice.h"
+
+ProductsService::ProductsService(const QSqlDatabase& db, QObject* parent)
+    : BaseService(db, parent), m_repo(new ProductsRepository(this)) {
+    m_repo->setDatabase(db);
+}
+
+QVariantMap ProductsService::createProduct(QVariantMap product)/*const QString& name, double quantity,
+                                           const QString& unit,
+                                           double proteins, double fats, double carbs*/ {
+    int id = m_repo->createProduct(product);
+
+    QVariantMap payload;
+    payload["id"] = id;
+    payload["name"] = product["name"];
+
+    return makeResponse(id != -1,
+                        id != -1 ? "Продукт создан" : "Ошибка создания продукта",
+                        payload);
+}
+
+QVariantMap ProductsService::getProduct(int id) {
+    QVariantMap product = m_repo->getProduct(id);
+    return makeResponse(!product.isEmpty(),
+                        product.isEmpty() ? "Продукт не найден" : "ОК",
+                        product);
+}
+
+QVariantList ProductsService::getAllProducts() {
+    return m_repo->getAll();
+}
+
+
+--- .\services\productservice.h ---
+#pragma once
+#include "BaseService.h"
+#include "repos/productsrepository.h"
+
+class ProductsService : public BaseService {
+    Q_OBJECT
+public:
+    explicit ProductsService(const QSqlDatabase& db, QObject* parent = nullptr);
+
+    // Создание продукта
+    Q_INVOKABLE QVariantMap createProduct(QVariantMap product);
+/*const QString& name, double quantity,
+                                          const QString& unit,
+                                          double proteins, double fats, double carbs*/
+    // Получение продукта по id
+    Q_INVOKABLE QVariantMap getProduct(int id);
+
+    // Получение всех продуктов
+    Q_INVOKABLE QVariantList getAllProducts();
+
+private:
+    ProductsRepository* m_repo;
+};
+
+
+--- .\services\recipeservice.cpp ---
+#include "recipeservice.h"
+
+/*RecipesService::RecipesService(const QSqlDatabase& db, QObject* parent)
+    : BaseService(db, parent),
+    m_recipes(new RecipesRepository(this)),
+    m_ingredients(new RecipeIngredientsRepository(this)),
+    m_products(new ProductsRepository(this)) {
+    m_recipes->setDatabase(db);
+    m_ingredients->setDatabase(db);
+    m_products->setDatabase(db);
+}*/
+
+QVariantMap RecipesService::createRecipe(const QString& name, const QList<int>& productIds) {
+    if (!beginTransaction()) return makeResponse(false, "Ошибка транзакции");
+
+    // 1. Создаём рецепт
+    int recipeId = m_recipes->createRecipe(name, 0, "", 0, 0, 0);
+    if (recipeId == -1) {
+        rollbackTransaction();
+        return makeResponse(false, "Не удалось создать рецепт");
+    }
+
+    // 2. Добавляем продукты в рецепт
+    double totalProteins = 0, totalFats = 0, totalCarbs = 0, totalCalories = 0;
+    for (int productId : productIds) {
+        m_ingredients->addProductToRecipe(recipeId, productId);
+
+        QVariantMap product = m_products->getProduct(productId);
+        totalProteins += product["proteins"].toDouble();
+        totalFats     += product["fats"].toDouble();
+        totalCarbs    += product["carbs"].toDouble();
+        totalCalories += product["proteins"].toDouble()*4
+                         + product["fats"].toDouble()*9
+                         + product["carbs"].toDouble()*4;
+    }
+
+    // 3. Обновляем агрегаты рецепта
+    QVariantMap updateVals;
+    updateVals["proteins"] = totalProteins;
+    updateVals["fats"]     = totalFats;
+    updateVals["carbs"]    = totalCarbs;
+    updateVals["calories"] = totalCalories;
+    m_recipes->update(recipeId, updateVals);
+
+    commitTransaction();
+
+    QVariantMap payload;
+    payload["id"] = recipeId;
+    payload["name"] = name;
+    payload["proteins"] = totalProteins;
+    payload["fats"] = totalFats;
+    payload["carbs"] = totalCarbs;
+    payload["calories"] = totalCalories;
+
+    return makeResponse(true, "Рецепт создан", payload);
+}
+
+//QVariantMap
+bool RecipesService::deleteRecipe(int recipeId) {
+    bool ok = m_recipes->deleteRecipeWithIngredients(recipeId);
+    return ok; //makeResponse(ok, ok ? "Рецепт удалён" : "Ошибка удаления");
+}
+
+
+--- .\services\recipeservice.h ---
+#include "BaseService.h"
+#include "repos/recipesrepository.h"
+#include "repos/recipeingredientsrepository.h"
+#include "repos/productsrepository.h"
+class RecipesService : public BaseService {
+    Q_OBJECT
+public:
+    explicit RecipesService(const QSqlDatabase& db, QObject* parent = nullptr)
+        : BaseService(db),
+        m_recipes(new RecipesRepository(this)),
+        m_ingredients(new RecipeIngredientsRepository(this)),
+        m_products(new ProductsRepository(this)) {
+        m_recipes->setDatabase(db);
+        m_ingredients->setDatabase(db);
+        m_products->setDatabase(db);
+    }
+
+    Q_INVOKABLE QVariantMap createRecipe(const QString& name, const QList<int>& productIds);
+    Q_INVOKABLE bool deleteRecipe(int recipeId);
+
+private:
+    RecipesRepository* m_recipes;
+    RecipeIngredientsRepository* m_ingredients;
+    ProductsRepository* m_products;
+};
+
+
+--- .\services\usersservice.cpp ---
+#include "UsersService.h"
+
+UsersService::UsersService(const QSqlDatabase& db, QObject* parent)
+    : BaseService(db, parent), m_repo(new UsersRepository(this)) {
+    m_repo->setDatabase(db);
+}
+
+QVariantMap UsersService::createUser(const QString& name, int age, const QString& gender,
+                                     double height, double weight, const QString& goal, int activityLevel) {
+    int id = m_repo->createUser(name, age, gender, height, weight, goal, activityLevel);
+    QVariantMap payload;
+    payload["id"] = id;
+    payload["name"] = name;
+    return makeResponse(id != -1, id != -1 ? "Пользователь создан" : "Ошибка создания", payload);
+}
+
+QVariantMap UsersService::getUser(int id) {
+    QVariantMap user = m_repo->getUser(id);
+    return makeResponse(!user.isEmpty(), user.isEmpty() ? "Не найден" : "ОК", user);
+}
+
+QVariantList UsersService::getAllUsers() {
+    return m_repo->getAllUsers();
+}
+
+QVariantMap UsersService::updateUser(int id, const QString& name, double weight) {
+    bool ok = m_repo->updateUser(id, name, weight);
+    QVariantMap payload;
+    payload["id"] = id;
+    payload["name"] = name;
+    payload["weight"] = weight;
+    return makeResponse(ok, ok ? "Обновлено" : "Ошибка обновления", payload);
+}
+
+QVariantMap UsersService::deleteUser(int id) {
+    bool ok = m_repo->deleteUser(id);
+    return makeResponse(ok, ok ? "Удалено" : "Ошибка удаления");
+}
+
+
+--- .\services\usersservice.h ---
+#pragma once
+#include "BaseService.h"
+#include "repos/usersrepository.h"
+
+class UsersService : public BaseService {
+    Q_OBJECT
+public:
+    explicit UsersService(const QSqlDatabase& db, QObject* parent = nullptr);
+
+    Q_INVOKABLE QVariantMap createUser(const QString& name, int age, const QString& gender,
+                                       double height, double weight, const QString& goal, int activityLevel);
+
+    Q_INVOKABLE QVariantMap getUser(int id);
+
+    Q_INVOKABLE QVariantList getAllUsers();
+
+    Q_INVOKABLE QVariantMap updateUser(int id, const QString& name, double weight);
+
+    Q_INVOKABLE QVariantMap deleteUser(int id);
+
+private:
+    UsersRepository* m_repo;
+};
+

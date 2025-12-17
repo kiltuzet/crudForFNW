@@ -25,12 +25,8 @@ QVariantMap ExerciseService::addExerciseEntry(int userId, const QString& date,
     QVariantMap stats = m_stats->getDailyStatisticsRecord(userId, date);
     double newCalories = stats["calories"].toDouble() - caloriesBurned; // вычитаем сожжённые калории
 
-    bool ok = m_stats->createOrUpdateDailyStatistics(userId, date,
-                                                     stats["waterMl"].toDouble(),
-                                                     stats["proteins"].toDouble(),
-                                                     stats["fats"].toDouble(),
-                                                     stats["carbs"].toDouble(),
-                                                     newCalories);
+    bool ok = m_stats->createOrUpdateDailyStatistics(userId,
+                                                     stats);
     if (!ok) {
         rollbackTransaction();
         return makeResponse(false, "Не удалось обновить статистику");

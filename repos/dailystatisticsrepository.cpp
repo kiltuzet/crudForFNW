@@ -8,20 +8,15 @@ DailyStatisticsRepository::DailyStatisticsRepository(QObject *parent)
                      {"id","user_id","date","water_ml","total_proteins","total_fats","total_carbs","total_calories"},
                      parent) {}
 
-bool DailyStatisticsRepository::createOrUpdateDailyStatistics(int userId, const QString &date,
-                                                              double waterMl,
-                                                              double totalProteins,
-                                                              double totalFats,
-                                                              double totalCarbs,
-                                                              double totalCalories) {
-    QVariantMap values;
+bool DailyStatisticsRepository::createOrUpdateDailyStatistics(int userId, QVariantMap values) {
+
     values["user_id"] = userId;
-    values["date"] = date;
+    /*values["date"] = date;
     values["water_ml"] = waterMl;
     values["total_proteins"] = totalProteins;
     values["total_fats"] = totalFats;
     values["total_carbs"] = totalCarbs;
-    values["total_calories"] = totalCalories;
+    values["total_calories"] = totalCalories;*/
     return createOrUpdate(userId, values);
 }
 

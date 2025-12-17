@@ -17,7 +17,7 @@ int BaseRepository::create(const QVariantMap &values) {
                     .arg(m_table, cols.join(", "), params.join(", "));
     for (auto it = values.begin(); it != values.end(); ++it)
         q.bindValue(":" + it.key(), it.value());
-
+    qDebug()<<QString(q.executedQuery());
     if (!q.exec()) {
         qWarning() << "Insert failed:" << q.lastError().text();
         return -1;
