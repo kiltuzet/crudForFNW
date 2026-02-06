@@ -17,5 +17,5 @@ public:
 
     bool removeProductFromRecipe(int recipeId, int productId);
 
-    int addProductToRecipe(int recipeId, int productId);
+    //int addProductToRecipe(int recipeId, int productId);
 };

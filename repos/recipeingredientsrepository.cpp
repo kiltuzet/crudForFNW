@@ -1,18 +1,13 @@
 #include "recipeingredientsrepository.h"
+#include "ProductsRepository.h"
+#include "recipesrepository.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
 
 RecipeIngredientsRepository::RecipeIngredientsRepository(QObject *parent)
     : BaseRepository("recipe_ingredients", {"id","recipe_id","product_id"}, parent) {}
-
-int RecipeIngredientsRepository::addProductToRecipe(int recipeId, int productId) {
-    QVariantMap values;
-    values["recipe_id"] = recipeId;
-    values["product_id"] = productId;
-    return create(values);
-}
-
+//получение продукта , возвращает список QVariantList
 QVariantList RecipeIngredientsRepository::getProductsForRecipe(int recipeId) {
     QVariantList out;
     if (!m_db.isValid() || !m_db.isOpen()) return out;
@@ -30,7 +25,7 @@ QVariantList RecipeIngredientsRepository::getProductsForRecipe(int recipeId) {
     }
     return out;
 }
-
+//удалегие продукта по id, возвращает bool, который является результатом выполнения операци
 bool RecipeIngredientsRepository::deleteAllForRecipe(int recipeId) {
     if (!m_db.isValid() || !m_db.isOpen()) return false;
     QSqlQuery q(m_db);

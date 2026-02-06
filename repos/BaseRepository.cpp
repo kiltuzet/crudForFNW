@@ -1,5 +1,5 @@
 #include "BaseRepository.h"
-
+// базовое создание , возвращает номер строки которая была создана
 int BaseRepository::create(const QVariantMap &values) {
     if (!m_db.isValid() || !m_db.isOpen()) return -1;
 
@@ -22,7 +22,7 @@ int BaseRepository::create(const QVariantMap &values) {
     }
     return q.lastInsertId().toInt();
 }
-
+//получаем запись бд , по id
 QVariantMap BaseRepository::getById(int id) {
     QVariantMap r;
     if (!m_db.isValid() || !m_db.isOpen()) return r;
@@ -38,7 +38,7 @@ QVariantMap BaseRepository::getById(int id) {
     }
     return r;
 }
-
+//получаем все записи по таблице , QVariantMap
 QVariantList BaseRepository::getAll() {
     QVariantList out;
     if (!m_db.isValid() || !m_db.isOpen()) return out;
@@ -55,7 +55,7 @@ QVariantList BaseRepository::getAll() {
     }
     return out;
 }
-
+//Возвращает результат выполнения опреации ( bool )
 bool BaseRepository::update(int id, const QVariantMap &values) {
     if (!m_db.isValid() || !m_db.isOpen()) return false;
 
@@ -73,7 +73,7 @@ bool BaseRepository::update(int id, const QVariantMap &values) {
 
     return q.exec();
 }
-
+//вставляетстроку , возвращает true,в случае успешного выполнения
 bool BaseRepository::insertWithKeys(const QString &tableName,
                                     const QVariantMap &values) {
     QStringList columns = values.keys();
@@ -92,7 +92,7 @@ bool BaseRepository::insertWithKeys(const QString &tableName,
     }
     return query.exec();
 }
-
+//возвращает id по содержимому поля
 int BaseRepository::getIdByField(const QString &tableName,
                                 const QString &name) {
     QSqlQuery query(m_db);
@@ -104,7 +104,7 @@ int BaseRepository::getIdByField(const QString &tableName,
     }
     return -1;
 }
-
+//удаление по id , если все прошло норм - true
 bool BaseRepository::deleteById(int id) {
     if (!m_db.isValid() || !m_db.isOpen()) return false;
     QSqlQuery q(m_db);
@@ -112,7 +112,7 @@ bool BaseRepository::deleteById(int id) {
     q.bindValue(":id", id);
     return q.exec();
 }
-
+//приходит название поля и значение поля, имя таблицы уже есть в переменной класса
 QVariantMap BaseRepository::getByField(const QString &fieldName, const QVariant &value)
 {
     QVariantMap result;
@@ -144,7 +144,7 @@ QVariantMap BaseRepository::getByField(const QString &fieldName, const QVariant 
 
     return result;
 }
-
+//базовый способ создать  или обновить таблицу
 bool BaseRepository::createOrUpdate(int id, const QVariantMap &values) {
     if (!m_db.isValid() || !m_db.isOpen()) return false;
 
